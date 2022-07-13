@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "ukrainian_handwriting"
+version = "0.1.0"
+description = ""
+authors = ["Nazar Polishchuk <nazarr.polishchuk@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+torch = "^1.12.0"
+torchvision = "^0.13.0"
+torchaudio = "^0.12.0"
+scikit-learn = "^1.1.1"
+
+[tool.poetry.dev-dependencies]
+notebook = "^6.4.12"
+pandas = "^1.4.3"
+matplotlib = "^3.5.2"
+numpy = "^1.23.0"
+seaborn = "^0.11.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
