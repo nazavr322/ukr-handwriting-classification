@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def code_labels(data: pd.DataFrame) -> pd.DataFrame:
+def encode_labels(data: pd.DataFrame) -> pd.DataFrame:
     """
     Adds a new column to a dataframe with all labels encoded into numbers
     """
