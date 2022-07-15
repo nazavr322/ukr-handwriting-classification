@@ -1,7 +1,8 @@
-import os
+from os.path import join
 
 import numpy as np
 from torchvision.datasets import MNIST
+
 
 def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
     """
@@ -15,12 +16,11 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
         out_name += '.csv'
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
-    with open(f'../data/raw/{out_name}', 'w', encoding='utf-8') as f:
+    with open(join('../data/raw', 'out_name'), 'w', encoding='utf-8') as f:
         f.write('label,is_uppercase,filename')
         for cls_indices in indices:
             for i, cls_idx in enumerate(cls_indices):
                 img, cls = data[cls_idx]
                 filename = f'glyphs/{cls}-{i}.png'
-                img.save(os.path.join('../data/raw', filename))
+                img.save(join('../data/raw', filename))
                 f.write(f'\n{cls},{False},{filename}')
-
