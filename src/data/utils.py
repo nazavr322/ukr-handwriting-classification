@@ -1,5 +1,5 @@
 from os.path import join
-from typing import Iterable, Union, Optional
+from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -32,7 +32,7 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
 
 
 def make_dataset(raw_path: str, mnist_path: str, out_path: str,
-                 cols_to_drop: Iterable[str]) -> None:
+                 cols_to_drop: list[str]) -> None:
     """
     Generates a complete dataset
     """
