@@ -6,7 +6,7 @@ import pandas as pd
 from torchvision.datasets import MNIST
 from sklearn.model_selection import train_test_split
 
-from ..features.features import code_labels
+from ..features.features import encode_labels
 
 
 def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
@@ -41,7 +41,7 @@ def make_dataset(raw_path: str, mnist_path: str, out_path: str,
     raw_df.to_csv('../../data/interim/data_cleaned.csv', index=False)
     mnist_df = pd.read_csv(mnist_path)
     completed_df = pd.concat((mnist_df, raw_df), ignore_index=True)
-    completed_df = code_labels(completed_df)
+    completed_df = encode_labels(completed_df)
     completed_df.to_csv(out_path, index=False)
 
 
