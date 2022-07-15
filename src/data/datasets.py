@@ -1,10 +1,12 @@
 import os
-from typing import Union, Optional
+from typing import Union
 
 import pandas as pd
 from PIL import Image
 import torch
 from torch.utils.data import Dataset
+
+from src import ROOT_DIR
 
 
 class HandwritingDataset(Dataset):
@@ -17,11 +19,10 @@ class HandwritingDataset(Dataset):
     def __len__(self) -> int:
         return len(self.df)
     
-    def __getitem__(self, idx) -> tuple[Union[Image.Image, torch.Tensor],
-                                        int,
+    def __getitem__(self, idx) -> tuple[Union[Image.Image, torch.Tensor], int,
                                         str]:
         row = self.df.iloc[idx]
-        full_path = os.path.join('../data/raw', row.filename)
+        full_path = os.path.join(ROOT_DIR, '/data/raw', row.filename)
         img = Image.open(full_path)
         if self.transforms:
             img = self.transforms(img)
