@@ -22,7 +22,9 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
         out_name += '.csv'
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
-    with open(join(ROOT_DIR, 'data/interim', out_name), 'w', encoding='utf-8') as f:
+    with open(
+        join(ROOT_DIR, 'data/interim', out_name), 'w', encoding='utf-8'
+    ) as f:
         f.write('label,is_uppercase,filename')
         for cls_indices in indices:
             for i, cls_idx in enumerate(cls_indices):
@@ -38,7 +40,9 @@ def make_dataset(raw_path: str, mnist_path: str, out_path: str) -> None:
     cols_to_drop = ['transliter_kmu2010', 'name', 'type', 'is_alternate',
                     'top', 'bottom', 'left', 'right', 'height', 'width']
     raw_df.drop(cols_to_drop, axis='columns', inplace=True)
-    raw_df.to_csv(join(ROOT_DIR, 'data/interim/data_cleaned.csv'), index=False)
+    raw_df.to_csv(
+        join(ROOT_DIR, 'data/interim/data_cleaned.csv'), index=False
+    )
     mnist_df = pd.read_csv(mnist_path)
     completed_df = pd.concat((mnist_df, raw_df), ignore_index=True)
     completed_df = encode_labels(completed_df)
@@ -56,7 +60,9 @@ def split_train_test(data_path: str,
     )
     x_train.insert(0, 'label', y_train)
     x_train.reset_index(inplace=True, drop=True)
-    x_train.to_csv(join(ROOT_DIR, 'data/processed/train_data.csv'), index=False)
+    x_train.to_csv(
+        join(ROOT_DIR, 'data/processed/train_data.csv'), index=False
+    )
     x_test.insert(0, 'label', y_test)
     x_test.reset_index(inplace=True, drop=True)
     x_test.to_csv(join(ROOT_DIR, 'data/processed/test_data.csv'), index=False)
