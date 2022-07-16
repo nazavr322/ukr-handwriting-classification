@@ -22,7 +22,7 @@ class HandwritingDataset(Dataset):
     def __getitem__(self, idx) -> tuple[Union[Image.Image, torch.Tensor], int,
                                         str]:
         row = self.df.iloc[idx]
-        full_path = os.path.join(ROOT_DIR, 'data/raw', row.filename)
+        full_path = os.path.join(ROOT_DIR, 'data/processed', row.filename)
         img = Image.open(full_path)
         if self.transforms:
             img = self.transforms(img)

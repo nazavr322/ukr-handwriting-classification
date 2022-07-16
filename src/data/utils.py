@@ -1,8 +1,11 @@
+import os
 from os.path import join
 from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
+import cv2 as cv
+import torchvision.transforms as T
 from torchvision.datasets import MNIST
 from sklearn.model_selection import train_test_split
 
@@ -10,7 +13,7 @@ from ..features.features import encode_labels
 from src import ROOT_DIR
 
 
-def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
+def prepare_mnist(num_samples: int, out_name: str) -> None:
     """
     Prepares `num_samples` samples of each class to be joined with original
     data.
@@ -20,6 +23,12 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
     """
     if not out_name.endswith('.csv'):
         out_name += '.csv'
+    data = MNIST(
+        join(ROOT_DIR, 'data/raw'),
+        download=True,
+        train=True,
+        transform=T.Compose([T.Grayscale(3)])
+    )
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
     with open(
@@ -30,8 +39,21 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
             for i, cls_idx in enumerate(cls_indices):
                 img, cls = data[cls_idx]
                 filename = f'glyphs/{cls}-{i}.png'
-                img.save(join(ROOT_DIR, 'data/raw', filename))
+                img.save(join(ROOT_DIR, 'data/processed', filename))
                 f.write(f'\n{cls},{False},{filename}')
+
+
+def prepare_glyphs(glyphs_path: str) -> None:
+    """ 
+    Prepares original glyphs to be compatible with MNIST format.
+
+    Each image is resized to the shape 28x28 and inverted.
+    """
+    for file in os.scandir(glyphs_path):
+        img = cv.imread(file.path)
+        img = cv.resize(img, (28, 28))
+        img = cv.bitwise_not(img)
+        cv.imwrite(join(ROOT_DIR, 'data/processed/glyphs', file.name), img)
 
 
 def make_dataset(raw_path: str, mnist_path: str, out_path: str) -> None:
@@ -66,5 +88,4 @@ def split_train_test(data_path: str,
     x_test.insert(0, 'label', y_test)
     x_test.reset_index(inplace=True, drop=True)
     x_test.to_csv(join(ROOT_DIR, 'data/processed/test_data.csv'), index=False)
-
 
