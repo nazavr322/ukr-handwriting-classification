@@ -10,6 +10,7 @@ torch = "^1.12.0"
 torchvision = "^0.13.0"
 torchaudio = "^0.12.0"
 scikit-learn = "^1.1.1"
+opencv-python = "^4.6.0"
 
 [tool.poetry.dev-dependencies]
 notebook = "^6.4.12"
