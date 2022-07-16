@@ -32,12 +32,11 @@ def parse_mnist(data: MNIST, num_samples: int, out_name: str) -> None:
                 f.write(f'\n{cls},{False},{filename}')
 
 
-def make_dataset(raw_path: str, mnist_path: str, out_path: str,
-                 cols_to_drop: list[str]) -> None:
-    """
-    Generates a complete dataset
-    """
+def make_dataset(raw_path: str, mnist_path: str, out_path: str) -> None:
+    """ Generates a complete dataset """
     raw_df = pd.read_csv(raw_path)
+    cols_to_drop = ['transliter_kmu2010', 'name', 'type', 'is_alternate',
+                    'top', 'bottom', 'left', 'right', 'height', 'width']
     raw_df.drop(cols_to_drop, axis='columns', inplace=True)
     raw_df.to_csv(join(ROOT_DIR, 'data/interim/data_cleaned.csv'), index=False)
     mnist_df = pd.read_csv(mnist_path)
