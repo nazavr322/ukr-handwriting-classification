@@ -1,1 +1,10 @@
-{"num_epochs": 30, "optimizer": "SGD", "learning_rate": 0.02880888755080388, "weight_decay": 0.004148667900144795, "scheduler": "ReduceLROnPlateau", "factor": 0.11183605527517573, "patience": 3}
+{
+    "num_epochs": 30,
+    "optimizer": "SGD",
+    "learning_rate": 0.02880888755080388,
+    "weight_decay": 0.004148667900144795,
+    "scheduler": "ReduceLROnPlateau",
+    "factor": 0.11183605527517573,
+    "patience": 3
+}
+
