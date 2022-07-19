@@ -62,13 +62,14 @@ def make_dataset(raw_path: str, mnist_path: str, out_path: str) -> None:
     cols_to_drop = ['transliter_kmu2010', 'name', 'type', 'is_alternate',
                     'top', 'bottom', 'left', 'right', 'height', 'width']
     raw_df.drop(cols_to_drop, axis='columns', inplace=True)
-    raw_df.to_csv(
-        join(ROOT_DIR, 'data/interim/data_cleaned.csv'), index=False
-    )
     mnist_df = pd.read_csv(mnist_path)
     completed_df = pd.concat((mnist_df, raw_df), ignore_index=True)
     completed_df = encode_labels(completed_df)
     completed_df.to_csv(out_path, index=False)
+    raw_df = encode_labels(raw_df)
+    raw_df.to_csv(
+        join(ROOT_DIR, 'data/interim/data_cleaned.csv'), index=False
+    )
 
 
 def split_train_test(data_path: str,
