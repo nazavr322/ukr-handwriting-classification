@@ -21,12 +21,13 @@ class HandwritingDataset(Dataset):
     def __len__(self) -> int:
         return len(self.df)
     
-    def __getitem__(self, idx) -> tuple[Union[Image.Image, torch.Tensor], int,
-                                        str]:
+    def __getitem__(
+        self, idx
+    ) -> tuple[Union[Image.Image, torch.Tensor], int, str, bool]:
         row = self.df.iloc[idx]
         full_path = os.path.join(ROOT_DIR, self.src_dir, row.filename)
         img = Image.open(full_path)
         if self.transforms:
             img = self.transforms(img)
-        return img, row.lbl_code, row.label
+        return img, row.lbl_code, row.is_uppercase, row.label
 
