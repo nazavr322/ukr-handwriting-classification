@@ -62,6 +62,7 @@ def make_dataset(raw_path: str, mnist_path: str, out_path: str) -> None:
     cols_to_drop = ['transliter_kmu2010', 'name', 'type', 'is_alternate',
                     'top', 'bottom', 'left', 'right', 'height', 'width']
     raw_df.drop(cols_to_drop, axis='columns', inplace=True)
+    raw_df.replace({False: 0, True: 1}, inplace=True)
     mnist_df = pd.read_csv(mnist_path)
     completed_df = pd.concat((mnist_df, raw_df), ignore_index=True)
     completed_df = encode_labels(completed_df)
