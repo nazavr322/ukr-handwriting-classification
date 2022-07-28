@@ -24,7 +24,6 @@ def merge_pictures(glyphs_path: str, mnist_path: str) -> None:
         for root, _, files in os.walk(directory):
             for filename in files:
                 shutil.copy2(os.path.join(root, filename), target_dir)
-        shutil.rmtree(directory) 
 
 
 if __name__ == '__main__':
