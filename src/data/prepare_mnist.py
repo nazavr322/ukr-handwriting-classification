@@ -16,7 +16,7 @@ def create_parser() -> ArgumentParser:
     return parser
 
 
-def prepare_mnist(raw_dir: str, out_path: str, num_samples: int, ) -> None:
+def prepare_mnist(raw_dir: str, out_path: str, num_samples: int) -> None:
     """
     Prepares `num_samples` samples of each class to be joined with original
     data.
