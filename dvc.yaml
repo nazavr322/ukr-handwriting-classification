@@ -1,0 +1,40 @@
+stages:
+  
+  prepare_mnist:
+    cmd: python src/data/prepare_mnist.py data/raw data/interim/digits.csv 50
+    deps:
+      - data/raw/MNIST/raw/
+    outs:
+      - data/interim/digits.csv
+      - data/processed/glyphs/
+
+  prepare_glyphs:
+    cmd: python src/data/prepare_glyphs.py data/raw/glyphs/ data/processed/glyphs/
+    deps:
+      - data/raw/glyphs/
+    outs:
+      - data/processed/glyphs/
+
+  clean_data:
+    cmd: python src/data/clean_data.py data/raw/glyphs.csv data/interim/data_cleaned.csv
+    deps:
+      - data/raw/glyphs.csv
+    outs:
+      - data/interim/data_cleaned.csv
+
+  make_dataset:
+    cmd: python -m src.data.make_dataset data/interim/data_cleaned.csv data/interim/digits.csv data/processed/final.csv
+    deps:
+      - data/interim/data_cleaned.csv
+      - data/interim/digits.csv
+    outs:
+      - data/processed/final.csv
+
+  train_test_split:
+    cmd: python src/data/split_train_test.py data/processed/final.csv
+    deps:
+      - data/processed/final.csv
+    outs:
+      - data/processed/train_data.csv
+      - data/processed/test_data.csv
+
