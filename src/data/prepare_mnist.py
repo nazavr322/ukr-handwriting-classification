@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 
 import numpy as np
@@ -23,16 +24,21 @@ def prepare_mnist(raw_dir: str, out_path: str, num_samples: int, ) -> None:
     Each sample is saved as an image, and corresponding information is added\
  to the `out_name`.csv file
     """
+    # create glyphs directory if it doesn't exist
+    if not os.path.isdir('data/processed/glyphs'):
+        os.mkdir('data/processed/glyphs')
+    
     data = MNIST(raw_dir, download=True, train=True, transform=T.Grayscale(3))
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
+
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write('label,is_uppercase,filename')
         for cls_indices in indices:
             for i, cls_idx in enumerate(cls_indices):
                 img, cls = data[cls_idx]
                 filename = f'glyphs/{cls}-{i}.png'
-                img.save('data/processed', filename)
+                img.save(os.path.join('data/processed', filename))
                 f.write(f'\n{cls},{False},{filename}')
 
 
