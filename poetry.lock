@@ -248,6 +248,28 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "black"
+version = "22.1.0"
+description = "The uncompromising code formatter."
+category = "dev"
+optional = false
+python-versions = ">=3.6.2"
+
+[package.dependencies]
+click = ">=8.0.0"
+mypy-extensions = ">=0.4.3"
+pathspec = ">=0.9.0"
+platformdirs = ">=2"
+tomli = ">=1.1.0"
+typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
+
+[package.extras]
+colorama = ["colorama (>=0.4.3)"]
+d = ["aiohttp (>=3.7.4)"]
+jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
+uvloop = ["uvloop (>=0.15.2)"]
+
+[[package]]
 name = "bleach"
 version = "5.0.1"
 description = "An easy safelist-based HTML-sanitizing tool."
@@ -262,6 +284,18 @@ webencodings = "*"
 [package.extras]
 css = ["tinycss2 (>=1.1.0,<1.2)"]
 dev = ["build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "pip-tools (==6.6.2)", "pytest (==7.1.2)", "Sphinx (==4.3.2)", "tox (==3.25.0)", "twine (==4.0.1)", "wheel (==0.37.1)", "black (==22.3.0)", "mypy (==0.961)"]
+
+[[package]]
+name = "blue"
+version = "0.9.1"
+description = "Blue -- Some folks like black but I prefer blue."
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+black = "22.1.0"
+flake8 = ">=3.8,<5.0.0"
 
 [[package]]
 name = "boto3"
@@ -625,7 +659,7 @@ pgp = ["gpg"]
 
 [[package]]
 name = "dvc"
-version = "2.15.0"
+version = "2.16.0"
 description = "Git for data scientists - manage your code and data together"
 category = "main"
 optional = false
@@ -639,10 +673,10 @@ colorama = ">=0.3.9"
 configobj = ">=5.0.6"
 distro = ">=1.3.0"
 dpath = ">=2.0.2,<3"
-dvc-data = "0.1.5"
-dvc-render = "0.0.6"
+dvc-data = "0.1.6"
+dvc-render = "0.0.9"
 dvc-task = "0.1.0"
-dvclive = ">=0.7.3"
+dvclive = ">=0.10.0"
 flatten-dict = ">=0.4.1,<1"
 "flufl.lock" = ">=5"
 fsspec = {version = ">=2021.10.1", extras = ["http"]}
@@ -688,7 +722,7 @@ webhdfs_kerberos = ["requests-kerberos (==0.14.0)"]
 
 [[package]]
 name = "dvc-data"
-version = "0.1.5"
+version = "0.1.6"
 description = "dvc data"
 category = "main"
 optional = false
@@ -697,21 +731,21 @@ python-versions = ">=3.8"
 [package.dependencies]
 dictdiffer = ">=0.8.1"
 diskcache = ">=5.2.1"
-dvc-objects = "0.1.5"
+dvc-objects = "0.1.6"
 funcy = ">=1.14"
 nanotime = ">=0.5.2"
 pygtrie = ">=2.3.2"
 shortuuid = ">=0.5.0"
 
 [package.extras]
-tests = ["pytest-servers[s3] (==0.0.7)", "mypy (==0.961)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
-dev = ["blake3 (>=0.3.1)", "pytest-servers[s3] (==0.0.7)", "mypy (==0.961)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)", "rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
+tests = ["pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
+dev = ["blake3 (>=0.3.1)", "pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)", "rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
 cli = ["rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
 all = ["rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
 
 [[package]]
 name = "dvc-objects"
-version = "0.1.5"
+version = "0.1.6"
 description = "dvc objects"
 category = "main"
 optional = false
@@ -728,7 +762,7 @@ typing-extensions = ">=3.7.4"
 
 [package.extras]
 webdav = ["webdav4 (>=0.9.3)"]
-tests = ["pytest-servers[s3] (==0.0.7)", "mypy (==0.961)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
+tests = ["pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
 ssh = ["sshfs[bcrypt] (>=2021.11.2)", "bcrypt"]
 s3 = ["aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)"]
 oss = ["ossfs (>=2021.8.0)"]
@@ -736,26 +770,27 @@ http = ["aiohttp-retry (>=2.4.5)"]
 hdfs = ["fsspec", "pyarrow (>=1)"]
 gs = ["gcsfs (>=2021.11.1)"]
 gdrive = ["pydrive2[fsspec] (>=1.14.0)"]
-dev = ["fsspec", "pyarrow (>=1)", "webdav4 (>=0.9.3)", "sshfs[bcrypt] (>=2021.11.2)", "bcrypt", "aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)", "ossfs (>=2021.8.0)", "aiohttp-retry (>=2.4.5)", "gcsfs (>=2021.11.1)", "pydrive2[fsspec] (>=1.14.0)", "knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)", "pytest-servers[s3] (==0.0.7)", "mypy (==0.961)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
+dev = ["fsspec", "pyarrow (>=1)", "webdav4 (>=0.9.3)", "sshfs[bcrypt] (>=2021.11.2)", "bcrypt", "aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)", "ossfs (>=2021.8.0)", "aiohttp-retry (>=2.4.5)", "gcsfs (>=2021.11.1)", "pydrive2[fsspec] (>=1.14.0)", "knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)", "pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
 azure = ["knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)"]
 all = ["fsspec", "pyarrow (>=1)", "webdav4 (>=0.9.3)", "sshfs[bcrypt] (>=2021.11.2)", "bcrypt", "aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)", "ossfs (>=2021.8.0)", "aiohttp-retry (>=2.4.5)", "gcsfs (>=2021.11.1)", "pydrive2[fsspec] (>=1.14.0)", "knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)"]
 
 [[package]]
 name = "dvc-render"
-version = "0.0.6"
+version = "0.0.9"
 description = "DVC render"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
-funcy = ">=1.17"
-tabulate = ">=0.8.7"
+tabulate = {version = ">=0.8.7", optional = true, markers = "extra == \"table\""}
 
 [package.extras]
-tests = ["pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.13.9)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)"]
+tests = ["pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.14.1)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "funcy (>=1.17)", "matplotlib", "tabulate (>=0.8.7)"]
+table = ["tabulate (>=0.8.7)"]
+markdown = ["matplotlib", "tabulate (>=0.8.7)"]
 docs = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)"]
-dev = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)", "pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.13.9)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)"]
+dev = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)", "pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.14.1)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "funcy (>=1.17)", "matplotlib", "tabulate (>=0.8.7)"]
 
 [[package]]
 name = "dvc-task"
@@ -779,19 +814,19 @@ dev = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdoc
 
 [[package]]
 name = "dvclive"
-version = "0.9.0"
+version = "0.10.0"
 description = "Metric logger for ML projects."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 
 [package.dependencies]
-dvc-render = "*"
+dvc-render = {version = ">=0.0.8", extras = ["table"]}
 
 [package.extras]
 xgb = ["xgboost"]
 tf = ["tensorflow"]
-tests = ["scikit-learn", "pytorch-lightning (>=1.6)", "fastai", "catalyst (<=21.12)", "datasets", "transformers", "lightgbm", "xgboost", "tensorflow", "mmcv", "pillow", "dvc-render", "dvc (>=2.0.0)", "funcy (>=1.14)", "pandas (>=1.3.1)", "pytest-mock (>=3.6.1)", "pytest-cov (>=2.12.1)", "pylint-plugin-utils (>=0.6)", "pre-commit", "pytest (>=6.0.1)", "pylint (==2.5.3)"]
+tests = ["scikit-learn", "pytorch-lightning (>=1.6)", "fastai", "catalyst (<=21.12)", "datasets", "transformers", "lightgbm", "xgboost", "tensorflow", "mmcv", "pillow", "dvc-render[table] (>=0.0.8)", "dvc (>=2.0.0)", "funcy (>=1.14)", "pandas (>=1.3.1)", "pytest-mock (>=3.6.1)", "pytest-cov (>=2.12.1)", "pylint-plugin-utils (>=0.6)", "pre-commit", "pytest (>=6.0.1)", "pylint (==2.5.3)"]
 sklearn = ["scikit-learn"]
 pytorch_lightning = ["pytorch-lightning (>=1.6)"]
 plots = ["scikit-learn"]
@@ -801,7 +836,7 @@ image = ["pillow"]
 huggingface = ["datasets", "transformers"]
 fastai = ["fastai"]
 catalyst = ["catalyst (<=21.12)"]
-all = ["scikit-learn", "pytorch-lightning (>=1.6)", "fastai", "catalyst (<=21.12)", "datasets", "transformers", "lightgbm", "xgboost", "tensorflow", "mmcv", "pillow", "dvc-render"]
+all = ["scikit-learn", "pytorch-lightning (>=1.6)", "fastai", "catalyst (<=21.12)", "datasets", "transformers", "lightgbm", "xgboost", "tensorflow", "mmcv", "pillow", "dvc-render[table] (>=0.0.8)"]
 
 [[package]]
 name = "entrypoints"
@@ -829,6 +864,19 @@ python-versions = "*"
 
 [package.extras]
 devel = ["colorama", "jsonschema", "json-spec", "pylint", "pytest", "pytest-benchmark", "pytest-cache", "validictory"]
+
+[[package]]
+name = "flake8"
+version = "4.0.1"
+description = "the modular source code checker: pep8 pyflakes and co"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+mccabe = ">=0.6.0,<0.7.0"
+pycodestyle = ">=2.8.0,<2.9.0"
+pyflakes = ">=2.4.0,<2.5.0"
 
 [[package]]
 name = "flatten-dict"
@@ -1300,6 +1348,14 @@ python-versions = ">=3.5"
 traitlets = "*"
 
 [[package]]
+name = "mccabe"
+version = "0.6.1"
+description = "McCabe checker, plugin for flake8"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "mistune"
 version = "0.8.4"
 description = "The fastest markdown parser in pure Python"
@@ -1314,6 +1370,14 @@ description = "multidict implementation"
 category = "main"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "mypy-extensions"
+version = "0.4.3"
+description = "Experimental type system extensions for programs checked with the mypy typechecker."
+category = "dev"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "nanotime"
@@ -1608,6 +1672,18 @@ docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-issues
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
 
 [[package]]
+name = "platformdirs"
+version = "2.5.2"
+description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+docs = ["furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-autodoc-typehints (>=1.12)", "sphinx (>=4)"]
+test = ["appdirs (==1.4.4)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)", "pytest (>=6)"]
+
+[[package]]
 name = "prettytable"
 version = "3.3.0"
 description = "A simple Python library for easily displaying tabular data in a visually appealing ASCII table format"
@@ -1682,6 +1758,14 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
+name = "pycodestyle"
+version = "2.8.0"
+description = "Python style guide checker"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[[package]]
 name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
@@ -1699,6 +1783,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.dependencies]
 pyparsing = ">=2.1.4"
+
+[[package]]
+name = "pyflakes"
+version = "2.4.0"
+description = "passive checker of Python programs"
+category = "dev"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pygit2"
@@ -2397,7 +2489,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "80e8da1b9e3aec7ccd4922cd5677d0eb897657df59d3e586cf4739562e2764c6"
+content-hash = "8777a6bf464da893e27f32f0c9ae75203d8b2cc5d8b7377fda87a85ba58405f7"
 
 [metadata.files]
 aiobotocore = []
@@ -2460,10 +2552,12 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
 ]
 billiard = []
+black = []
 bleach = [
     {file = "bleach-5.0.1-py3-none-any.whl", hash = "sha256:085f7f33c15bd408dd9b17a4ad77c577db66d76203e5984b1bd59baeee948b2a"},
     {file = "bleach-5.0.1.tar.gz", hash = "sha256:0d03255c47eb9bd2f26aa9bb7f2107732e7e8fe195ca2f64709fcf3b0a4a085c"},
 ]
+blue = []
 boto3 = []
 botocore = []
 celery = []
@@ -2589,6 +2683,7 @@ executing = [
     {file = "executing-0.8.3.tar.gz", hash = "sha256:c6554e21c6b060590a6d3be4b82fb78f8f0194d809de5ea7df1c093763311501"},
 ]
 fastjsonschema = []
+flake8 = []
 flatten-dict = []
 "flufl.lock" = []
 fonttools = []
@@ -2723,11 +2818,13 @@ matplotlib-inline = [
     {file = "matplotlib-inline-0.1.3.tar.gz", hash = "sha256:a04bfba22e0d1395479f866853ec1ee28eea1485c1d69a6faf00dc3e24ff34ee"},
     {file = "matplotlib_inline-0.1.3-py3-none-any.whl", hash = "sha256:aed605ba3b72462d64d475a21a9296f400a19c4f74a31b59103d2a99ffd5aa5c"},
 ]
+mccabe = []
 mistune = [
     {file = "mistune-0.8.4-py2.py3-none-any.whl", hash = "sha256:88a1051873018da288eee8538d476dffe1262495144b33ecb586c4ab266bb8d4"},
     {file = "mistune-0.8.4.tar.gz", hash = "sha256:59a3429db53c50b5c6bcc8a07f8848cb00d7dc8bdb431a4ab41920d201d4756e"},
 ]
 multidict = []
+mypy-extensions = []
 nanotime = []
 nbclient = [
     {file = "nbclient-0.6.6-py3-none-any.whl", hash = "sha256:09bae4ea2df79fa6bc50aeb8278d8b79d2036792824337fa6eee834afae17312"},
@@ -2859,6 +2956,7 @@ pillow = [
     {file = "Pillow-9.2.0-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:0030fdbd926fb85844b8b92e2f9449ba89607231d3dd597a21ae72dc7fe26927"},
     {file = "Pillow-9.2.0.tar.gz", hash = "sha256:75e636fd3e0fb872693f23ccb8a5ff2cd578801251f3a4f6854c6a5d437d3c04"},
 ]
+platformdirs = []
 prettytable = []
 prometheus-client = [
     {file = "prometheus_client-0.14.1-py3-none-any.whl", hash = "sha256:522fded625282822a89e2773452f42df14b5a8e84a86433e3f8a189c1d54dc01"},
@@ -2914,11 +3012,13 @@ py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
 ]
+pycodestyle = []
 pycparser = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
 ]
 pydot = []
+pyflakes = []
 pygit2 = []
 pygments = [
     {file = "Pygments-2.12.0-py3-none-any.whl", hash = "sha256:dc9c10fb40944260f6ed4c688ece0cd2048414940f1cea51b8b226318411c519"},
