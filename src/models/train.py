@@ -13,8 +13,6 @@ from src import ROOT_DIR
 from .models import HandwritingClassifier
 from ..data.datasets import HandwritingDataset
 
-DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
 
 def create_parser() -> ArgumentParser:
     """ Initializes parser """
@@ -59,7 +57,7 @@ def compute_accuracy(prediction, ground_truth) -> float:
     return correct_count / len(ground_truth)
 
 
-def validate_model(model, losses, loader) -> tuple[float, ...]:
+def validate_model(model, losses, loader, device) -> tuple[float, ...]:
     """ Validates model based on 2 metrics """
     model.eval()
     loss_acum = 0
@@ -67,9 +65,9 @@ def validate_model(model, losses, loader) -> tuple[float, ...]:
     is_upp_acc = 0
 
     for i, (x, *y) in enumerate(loader):
-        x_gpu = x.to(DEVICE)
+        x_gpu = x.to(device)
         y[1] = y[1].unsqueeze(1).float()
-        y_gpu = tuple(target.to(DEVICE) for target in y)
+        y_gpu = tuple(target.to(device) for target in y)
 
         prediction = model(x_gpu)
         loss_value = sum(loss(out, targ) for loss, out, targ in zip(losses, prediction, y_gpu))
@@ -83,7 +81,7 @@ def validate_model(model, losses, loader) -> tuple[float, ...]:
 
 
 def train_model(model, train_loader, val_loader, optimizer, losses,
-                num_epochs, scheduler=None) -> None:
+                num_epochs, device, scheduler=None) -> None:
     """ Performs a full training process """
     t_loss_history = []
     v_loss_history = []
@@ -95,9 +93,9 @@ def train_model(model, train_loader, val_loader, optimizer, losses,
 
         loss_acum = 0
         for i, (x, *y) in enumerate(train_loader):
-            x_gpu = x.to(DEVICE)
+            x_gpu = x.to(device)
             y[1] = y[1].unsqueeze(1).float()
-            y_gpu = tuple(target.to(DEVICE) for target in y)
+            y_gpu = tuple(target.to(device) for target in y)
 
             prediction = model(x_gpu)
             loss_value = sum(loss(out, targ) for loss, out, targ in zip(losses, prediction, y_gpu))
@@ -108,7 +106,7 @@ def train_model(model, train_loader, val_loader, optimizer, losses,
 
             loss_acum += loss_value.item()
         epoch_loss = loss_acum / i
-        val_loss, lbl_acc, is_upp_acc = validate_model(model, losses, val_loader)
+        val_loss, lbl_acc, is_upp_acc = validate_model(model, losses, val_loader, device)
 
         if scheduler:
             if isinstance(scheduler, optim.lr_scheduler.ReduceLROnPlateau):
@@ -129,12 +127,15 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args() # read cmd arguments
 
+    # initialize device
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
     # initialize model
     model = HandwritingClassifier()
     model.load_state_dict(torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
                           strict=False)
     model.type(torch.cuda.FloatTensor)
-    model.to(DEVICE)
+    model.to(device)
 
     # initialize dataset
     dataset = initialize_dataset(args.train_path) 
@@ -161,4 +162,4 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=GAMMA, patience=PAT)
 
     train_model(model, train_loader, val_loader, optimizer, losses,
-                NUM_EPOCHS, scheduler)
+                NUM_EPOCHS, device, scheduler)
