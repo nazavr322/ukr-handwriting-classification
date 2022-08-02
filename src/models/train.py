@@ -1,7 +1,7 @@
 import os
 import json
 from argparse import ArgumentParser
- 
+
 import numpy as np
 import torch
 import torch.optim as optim
@@ -15,29 +15,38 @@ from ..data.datasets import HandwritingDataset
 
 
 def create_parser() -> ArgumentParser:
-    """ Initializes parser """
+    """Initializes parser"""
     parser = ArgumentParser()
     parser.add_argument('train_path', help='.csv file with the training data')
-    parser.add_argument('model_weights_path', help='.pt file with the weights of a model pretrained on MNIST')
-    parser.add_argument('params_path', help='.json file with hyperparameters values')
+    parser.add_argument(
+        'model_weights_path',
+        help='.pt file with the weights of a model pretrained on MNIST',
+    )
+    parser.add_argument(
+        'params_path', help='.json file with hyperparameters values'
+    )
     return parser
 
 
 def initialize_dataset(data_path: str) -> HandwritingDataset:
-    """ Initializes dataset """
+    """Initializes dataset"""
     MEAN = HandwritingClassifier._mean
     STD = HandwritingClassifier._std
-    transforms = T.Compose([
-        T.RandomRotation(30),
-        T.RandomAffine(0, (0.1, 0.1)),
-        T.ToTensor(),
-        T.Normalize(mean=MEAN, std=STD)
-    ])
+    transforms = T.Compose(
+        [
+            T.RandomRotation(30),
+            T.RandomAffine(0, (0.1, 0.1)),
+            T.ToTensor(),
+            T.Normalize(mean=MEAN, std=STD),
+        ]
+    )
     return HandwritingDataset(os.path.join(ROOT_DIR, data_path), transforms)
 
 
-def initialize_loaders(dataset, batch_size: int = 64, val_size: int = 100) -> tuple[DataLoader, ...]:
-    """ Initializes train and validation dataloaders """
+def initialize_loaders(
+    dataset, batch_size: int = 64, val_size: int = 100
+) -> tuple[DataLoader, DataLoader]:
+    """Initializes train and validation dataloaders"""
     indices = list(range(len(dataset)))
     np.random.seed(42)
     np.random.shuffle(indices)
@@ -45,20 +54,20 @@ def initialize_loaders(dataset, batch_size: int = 64, val_size: int = 100) -> tu
 
     train_sampler = SubsetRandomSampler(train_indices)
     val_sampler = SubsetRandomSampler(val_indices)
-    
+
     train_loader = DataLoader(dataset, batch_size, sampler=train_sampler)
     val_loader = DataLoader(dataset, sampler=val_sampler)
-    return train_loader, val_loader 
+    return train_loader, val_loader
 
 
 def compute_accuracy(prediction, ground_truth) -> float:
-    """ Computes accuracy between prediction and ground_truth """
+    """Computes accuracy between prediction and ground_truth"""
     correct_count = torch.sum(prediction == ground_truth).item()
     return correct_count / len(ground_truth)
 
 
 def validate_model(model, losses, loader, device) -> tuple[float, ...]:
-    """ Validates model based on 2 metrics """
+    """Validates model based on 2 metrics"""
     model.eval()
     loss_acum = 0
     lbl_acc = 0
@@ -70,7 +79,10 @@ def validate_model(model, losses, loader, device) -> tuple[float, ...]:
         y_gpu = tuple(target.to(device) for target in y)
 
         prediction = model(x_gpu)
-        loss_value = sum(loss(out, targ) for loss, out, targ in zip(losses, prediction, y_gpu))
+        loss_value = sum(
+            loss(out, targ)
+            for loss, out, targ in zip(losses, prediction, y_gpu)
+        )
 
         loss_acum += loss_value.item()
         labels = torch.argmax(prediction[0], 1)
@@ -80,9 +92,17 @@ def validate_model(model, losses, loader, device) -> tuple[float, ...]:
     return loss_acum / i, lbl_acc / i, is_upp_acc / i
 
 
-def train_model(model, train_loader, val_loader, optimizer, losses,
-                num_epochs, device, scheduler=None) -> None:
-    """ Performs a full training process """
+def train_model(
+    model,
+    train_loader,
+    val_loader,
+    optimizer,
+    losses,
+    num_epochs: int,
+    device,
+    scheduler=None,
+) -> None:
+    """Performs a full training process"""
     t_loss_history = []
     v_loss_history = []
     lbl_acc_history = []
@@ -98,15 +118,20 @@ def train_model(model, train_loader, val_loader, optimizer, losses,
             y_gpu = tuple(target.to(device) for target in y)
 
             prediction = model(x_gpu)
-            loss_value = sum(loss(out, targ) for loss, out, targ in zip(losses, prediction, y_gpu))
-            
+            loss_value = sum(
+                loss(out, targ)
+                for loss, out, targ in zip(losses, prediction, y_gpu)
+            )
+
             optimizer.zero_grad()
             loss_value.backward()
             optimizer.step()
 
             loss_acum += loss_value.item()
         epoch_loss = loss_acum / i
-        val_loss, lbl_acc, is_upp_acc = validate_model(model, losses, val_loader, device)
+        val_loss, lbl_acc, is_upp_acc = validate_model(
+            model, losses, val_loader, device
+        )
 
         if scheduler:
             if isinstance(scheduler, optim.lr_scheduler.ReduceLROnPlateau):
@@ -118,32 +143,39 @@ def train_model(model, train_loader, val_loader, optimizer, losses,
         v_loss_history.append(val_loss)
         lbl_acc_history.append(lbl_acc)
         is_upp_acc_history.append(is_upp_acc)
-        
-        print(f'{epoch + 1}. Loss = {epoch_loss:.6f}; Val loss = {val_loss:.6f}')
+
+        print(
+            f'{epoch + 1}. Loss = {epoch_loss:.6f}; Val loss = {val_loss:.6f}'
+        )
         print(f'Label accuracy = {lbl_acc}; Is_upper accuracy = {is_upp_acc}')
 
 
 if __name__ == '__main__':
     parser = create_parser()
-    args = parser.parse_args() # read cmd arguments
+    args = parser.parse_args()   # read cmd arguments
 
     # initialize device
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
 
     # initialize model
     model = HandwritingClassifier()
-    model.load_state_dict(torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
-                          strict=False)
+    model.load_state_dict(
+        torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
+        strict=False,
+    )
     model.type(torch.cuda.FloatTensor)
     model.to(device)
 
     # initialize dataset
-    dataset = initialize_dataset(args.train_path) 
+    dataset = initialize_dataset(args.train_path)
 
     # read hyperparameters from .json file
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
-    
+
     # initialize data loaders
     BATCH_SIZE = params['batch_size']
     train_loader, val_loader = initialize_loaders(dataset, BATCH_SIZE)
@@ -158,8 +190,13 @@ if __name__ == '__main__':
     criterion2 = BCEWithLogitsLoss().type(torch.cuda.FloatTensor)
     losses = (criterion1, criterion2)
 
-    optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.9, weight_decay=REG)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=GAMMA, patience=PAT)
+    optimizer = optim.SGD(
+        model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
+    )
+
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, factor=GAMMA, patience=PAT
+    )
 
     train_model(model, train_loader, val_loader, optimizer, losses,
                 NUM_EPOCHS, device, scheduler)
