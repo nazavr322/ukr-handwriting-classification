@@ -101,7 +101,7 @@ def train_model(
     num_epochs: int,
     device,
     scheduler=None,
-) -> None:
+) -> tuple[list[float], ...]:
     """Performs a full training process"""
     t_loss_history = []
     v_loss_history = []
@@ -148,6 +148,7 @@ def train_model(
             f'{epoch + 1}. Loss = {epoch_loss:.6f}; Val loss = {val_loss:.6f}'
         )
         print(f'Label accuracy = {lbl_acc}; Is_upper accuracy = {is_upp_acc}')
+    return t_loss_history, v_loss_history, lbl_acc_history, is_upp_acc_history
 
 
 if __name__ == '__main__':
