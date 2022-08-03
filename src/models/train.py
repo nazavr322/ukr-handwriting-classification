@@ -1,5 +1,5 @@
-import os
 import json
+from os.path import join
 from argparse import ArgumentParser
 
 import numpy as np
@@ -25,6 +25,9 @@ def create_parser() -> ArgumentParser:
     parser.add_argument(
         'params_path', help='.json file with hyperparameters values'
     )
+    parser.add_argument(
+        'out_weights_path', help='where to store trained model weights'
+    )
     return parser
 
 
@@ -40,7 +43,7 @@ def initialize_dataset(data_path: str) -> HandwritingDataset:
             T.Normalize(mean=MEAN, std=STD),
         ]
     )
-    return HandwritingDataset(os.path.join(ROOT_DIR, data_path), transforms)
+    return HandwritingDataset(join(ROOT_DIR, data_path), transforms)
 
 
 def initialize_loaders(
@@ -164,8 +167,7 @@ if __name__ == '__main__':
     # initialize model
     model = HandwritingClassifier()
     model.load_state_dict(
-        torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
-        strict=False,
+        torch.load(join(ROOT_DIR, args.model_weights_path)), strict=False
     )
     model.type(torch.cuda.FloatTensor)
     model.to(device)
@@ -174,23 +176,26 @@ if __name__ == '__main__':
     dataset = initialize_dataset(args.train_path)
 
     # read hyperparameters from .json file
-    with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
+    with open(join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
 
     # initialize data loaders
     BATCH_SIZE = params['batch_size']
     train_loader, val_loader = initialize_loaders(dataset, BATCH_SIZE)
 
+    # initialize hyperparameters
     NUM_EPOCHS = params['num_epochs']
     LR = params['learning_rate']
     REG = params['weight_decay']
     GAMMA = params['factor']
     PAT = params['patience']
-
+    
+    # initialize loss functions
     criterion1 = CrossEntropyLoss().type(torch.cuda.FloatTensor)
     criterion2 = BCEWithLogitsLoss().type(torch.cuda.FloatTensor)
     losses = (criterion1, criterion2)
-
+    
+    # initialize optimizer and lr-scheduler
     optimizer = optim.SGD(
         model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
     )
@@ -199,5 +204,10 @@ if __name__ == '__main__':
         optimizer, factor=GAMMA, patience=PAT
     )
 
+    # train model
     train_model(model, train_loader, val_loader, optimizer, losses,
                 NUM_EPOCHS, device, scheduler)
+
+    # save trained model
+    torch.save(model.state_dict(), join(ROOT_DIR, args.out_weights_path))
+
