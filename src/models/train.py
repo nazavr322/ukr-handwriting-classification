@@ -1,5 +1,5 @@
+import os
 import json
-from os.path import join
 from argparse import ArgumentParser
 
 import numpy as np
@@ -40,10 +40,10 @@ def initialize_dataset(data_path: str) -> HandwritingDataset:
             T.RandomRotation(30),
             T.RandomAffine(0, (0.1, 0.1)),
             T.ToTensor(),
-            T.Normalize(mean=MEAN, std=STD),
+            T.Normalize(mean=MEAN, std=STD)
         ]
     )
-    return HandwritingDataset(join(ROOT_DIR, data_path), transforms)
+    return HandwritingDataset(os.path.join(ROOT_DIR, data_path), transforms)
 
 
 def initialize_loaders(
@@ -89,9 +89,9 @@ def validate_model(model, losses, loader, device) -> tuple[float, ...]:
 
         loss_acum += loss_value.item()
         labels = torch.argmax(prediction[0], 1)
-        lbl_acc = compute_accuracy(labels, y_gpu[0])
+        lbl_acc += compute_accuracy(labels, y_gpu[0])
         is_upp = 0 if prediction[1].item() < 0.5 else 1
-        is_upp_acc = compute_accuracy(is_upp, y_gpu[1])
+        is_upp_acc += compute_accuracy(is_upp, y_gpu[1])
     return loss_acum / i, lbl_acc / i, is_upp_acc / i
 
 
@@ -167,7 +167,8 @@ if __name__ == '__main__':
     # initialize model
     model = HandwritingClassifier()
     model.load_state_dict(
-        torch.load(join(ROOT_DIR, args.model_weights_path)), strict=False
+        torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
+        strict=False
     )
     model.type(torch.cuda.FloatTensor)
     model.to(device)
@@ -176,7 +177,7 @@ if __name__ == '__main__':
     dataset = initialize_dataset(args.train_path)
 
     # read hyperparameters from .json file
-    with open(join(ROOT_DIR, args.params_path), 'r') as f:
+    with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
 
     # initialize data loaders
@@ -189,12 +190,12 @@ if __name__ == '__main__':
     REG = params['weight_decay']
     GAMMA = params['factor']
     PAT = params['patience']
-    
+
     # initialize loss functions
     criterion1 = CrossEntropyLoss().type(torch.cuda.FloatTensor)
     criterion2 = BCEWithLogitsLoss().type(torch.cuda.FloatTensor)
     losses = (criterion1, criterion2)
-    
+
     # initialize optimizer and lr-scheduler
     optimizer = optim.SGD(
         model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
@@ -203,11 +204,20 @@ if __name__ == '__main__':
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, factor=GAMMA, patience=PAT
     )
+    
+    # get terminal width
+    width = os.get_terminal_size()[0]
+    print(
+        f'{"=" * width}\n{"Training started".center(width)}\n{"=" * width}\n'
+    )
 
     # train model
     train_model(model, train_loader, val_loader, optimizer, losses,
                 NUM_EPOCHS, device, scheduler)
 
     # save trained model
-    torch.save(model.state_dict(), join(ROOT_DIR, args.out_weights_path))
+    torch.save(
+        model.state_dict(), os.path.join(ROOT_DIR, args.out_weights_path)
+    )
 
+    print('\nYour model is saved!')
