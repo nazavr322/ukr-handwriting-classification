@@ -170,7 +170,6 @@ if __name__ == '__main__':
         torch.load(os.path.join(ROOT_DIR, args.model_weights_path)),
         strict=False
     )
-    model.type(torch.cuda.FloatTensor)
     model.to(device)
 
     # initialize dataset
@@ -192,8 +191,8 @@ if __name__ == '__main__':
     PAT = params['patience']
 
     # initialize loss functions
-    criterion1 = CrossEntropyLoss().type(torch.cuda.FloatTensor)
-    criterion2 = BCEWithLogitsLoss().type(torch.cuda.FloatTensor)
+    criterion1 = CrossEntropyLoss().to(device)
+    criterion2 = BCEWithLogitsLoss().to(device)
     losses = (criterion1, criterion2)
 
     # initialize optimizer and lr-scheduler
