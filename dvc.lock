@@ -80,3 +80,23 @@ stages:
       md5: 3efeb69678d8cca5f95dc5d61871f782.dir
       size: 527028
       nfiles: 1595
+  train_and_evaluate:
+    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv
+      models/mnist_model.pt models/best_params.json models/test_run.pt reports/figures/
+    deps:
+    - path: data/processed/test_data.csv
+      md5: d298ed5f35958344cb2db903757fee52
+      size: 7014
+    - path: data/processed/train_data.csv
+      md5: 000b7fd561981101b12365cb85c5f7ee
+      size: 30030
+    - path: models/best_params.json
+      md5: 46cd7d7adbeddc8cb8ab78a5c5836daa
+      size: 249
+    - path: models/mnist_model.pt
+      md5: 888469a8360c8d350bfb7943db4f027d
+      size: 3312672
+    outs:
+    - path: models/test_run.pt
+      md5: d9070c58e9f60238757d6b0f5841fe8f
+      size: 3348314
