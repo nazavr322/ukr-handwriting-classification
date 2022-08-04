@@ -23,6 +23,9 @@ from ..data.datasets import HandwritingDataset
 MEAN = HandwritingClassifier._mean
 STD = HandwritingClassifier._std
 
+# initialize device
+DEVICE = device('cuda') if cuda.is_available() else device('cpu')
+
 
 def create_parser() -> ArgumentParser:
     """Initializes parser"""
@@ -50,11 +53,7 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()  # parse cmd arguments
 
-    # initialize device
-    if cuda.is_available():
-        DEVICE = device('cuda')
-    else:
-        DEVICE = device('cpu')
+    
 
     width = os.get_terminal_size()[0]  # get terminal width
     title_str = '=' * 130 + '\n' + '{}' + '=' * 130 + '\n'
@@ -119,7 +118,7 @@ if __name__ == '__main__':
 
     # train model
     train_results = train_model(model, train_loader, val_loader, optimizer,
-                                losses, NUM_EPOCHS, device, scheduler)
+                                losses, NUM_EPOCHS, DEVICE, scheduler)
 
     # save trained model
     out_path = os.path.join(ROOT_DIR, args.out_weights_path)
@@ -128,7 +127,7 @@ if __name__ == '__main__':
 
     # start model evaluation
     print(title_str.format('Evaluation started'.center(width)))
-    lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, device)
+    lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
     print(
         f'Accuracy of a label classification on a test dataset = {lbl_acc:.2%}'
     )
