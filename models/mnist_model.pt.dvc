@@ -1,4 +1,0 @@
-outs:
-- md5: 888469a8360c8d350bfb7943db4f027d
-  size: 3312672
-  path: mnist_model.pt
