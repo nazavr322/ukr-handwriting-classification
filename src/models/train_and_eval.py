@@ -53,11 +53,9 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()  # parse cmd arguments
 
-    
-
     width = os.get_terminal_size()[0]  # get terminal width
-    title_str = '=' * 130 + '\n' + '{}' + '=' * 130 + '\n'
-    print(title_str.format('Training started'.center(width)))
+    title_template = '=' * 130 + '\n' + '{}' + '=' * 130 + '\n'
+    print(title_template.format('Training started'.center(width)))
 
     # initialize model
     model = HandwritingClassifier()
@@ -126,14 +124,11 @@ if __name__ == '__main__':
     print(f'\nYour model is saved at {out_path}\n')
 
     # start model evaluation
-    print(title_str.format('Evaluation started'.center(width)))
+    print(title_template.format('Evaluation started'.center(width)))
     lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
-    print(
-        f'Accuracy of a label classification on a test dataset = {lbl_acc:.2%}'
-    )
-    print(
-        f'Accuracy of case classification on a test dataset = {is_upp_acc:.2%}'
-    )
+    acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
+    print(acc_msg.format('label', lbl_acc))
+    print(acc_msg.format('case', is_upp_acc))
 
     # create array of true labels
     ground_truth = np.array([(x.item(), y.item()) for _, x, y in test_loader])
@@ -151,7 +146,7 @@ if __name__ == '__main__':
         fontsize=22,
         dpi=300,
     )
-    print('Confusion matrix is saved at', full_path)
+    print('\nConfusion matrix is saved at', full_path)
     full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'is_upp_cm.png')
     save_confusion_matrix(
         full_path,
