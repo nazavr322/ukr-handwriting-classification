@@ -47,8 +47,7 @@ stages:
       - data/processed/test_data.csv
 
   train_and_evaluate:
-    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/mnist_model.pt\
-         models/best_params.json models/test_run.pt reports/figures/
+    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/mnist_model.pt models/best_params.json models/test_run.pt reports/figures/
     deps:
       - data/processed/train_data.csv
       - data/processed/test_data.csv
