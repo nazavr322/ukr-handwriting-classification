@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
         # log metrics on test dataset
         mlflow.log_metric('Label accuracy', lbl_acc)
-        mlflow.log_metric('Is upp acuuracy', is_upp_acc)
+        mlflow.log_metric('Is upp accuracy', is_upp_acc)
 
     # create array of true labels
     ground_truth = np.array([(x.item(), y.item()) for _, x, y in test_loader])
