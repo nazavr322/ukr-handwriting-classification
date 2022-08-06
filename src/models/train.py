@@ -41,10 +41,6 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()  # parse cmd arguments
 
-    width = os.get_terminal_size()[0]  # get terminal width
-    title_template = '=' * width + '\n' + '{}' + '=' * width + '\n'
-    print(title_template.format('Training started'.center(width)))
-
     # initialize model
     model = HandwritingClassifier()
     model.load_state_dict(
@@ -54,7 +50,7 @@ if __name__ == '__main__':
     model.to(DEVICE)
 
     # initialize train dataset
-    train_tfs = T.Compose(
+    tfs = T.Compose(
         [
             T.RandomRotation(30),
             T.RandomAffine(0, (0.1, 0.1)),
@@ -62,15 +58,7 @@ if __name__ == '__main__':
             T.Normalize(mean=MEAN, std=STD),
         ]
     )
-    train_dset = HandwritingDataset(
-        os.path.join(ROOT_DIR, args.train_path), train_tfs
-    )
-
-    # initialize test dataset
-    test_tfs = T.Compose([T.ToTensor(), T.Normalize(mean=MEAN, std=STD)])
-    test_dset = HandwritingDataset(
-        os.path.join(ROOT_DIR, args.test_path), test_tfs
-    )
+    dataset = HandwritingDataset(os.path.join(ROOT_DIR, args.train_path), tfs)
 
     # read hyperparameters from .json file
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
@@ -86,7 +74,7 @@ if __name__ == '__main__':
 
         # initialize data loaders
         BATCH_SIZE = params['batch_size']
-        train_loader, val_loader = initialize_loaders(train_dset, BATCH_SIZE)
+        train_loader, val_loader = initialize_loaders(dataset, BATCH_SIZE)
 
         # initialize other hyperparameters
         NUM_EPOCHS = params['num_epochs']
@@ -107,6 +95,11 @@ if __name__ == '__main__':
 
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, factor=GAMMA, patience=PAT
+        )
+        
+        width = os.get_terminal_size()[0]  # get terminal width
+        print(
+            f'{"="*width}\n{"Training started".center(width)}\n{"="*width}\n'
         )
 
         # train model
