@@ -55,7 +55,7 @@ stages:
     outs:
       - models/test_run.pt
 
-  test:
+  evaluate:
     cmd: python -m src.models.evaluate data/processed/test_data.csv models/test_run.pt reports/figures/
     deps:
       - data/processed/test_data.csv
