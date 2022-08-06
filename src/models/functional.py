@@ -1,5 +1,3 @@
-import os
-
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
@@ -140,10 +138,13 @@ def evaluate(model, loader, device) -> tuple[float, float, np.ndarray]:
     return lbl_acc / i, is_upp_acc / i, np.array(preds)
 
 
-def save_confusion_matrix(
-    filepath: str, gt, preds, disp_labels, title, **kwargs
-) -> None:
-    """Saves confusion matrix between `gt` and `preds` as a picture."""
+def get_confusion_matrix(
+    gt, preds, disp_labels, title: str, **kwargs
+) -> ConfusionMatrixDisplay:
+    """
+    Returns confusion matrix between `gt` and `preds` as a 
+    `ConfusionMatrixDisplay` object.
+    """
     cm = ConfusionMatrixDisplay.from_predictions(
         gt, preds, display_labels=disp_labels
     )
@@ -153,9 +154,5 @@ def save_confusion_matrix(
     if figsize:
         cm.figure_.set_size_inches(figsize)
 
-    dir_name = os.path.split(filepath)[0]
-    if not os.path.isdir(dir_name):
-        os.makedirs(dir_name)
-
     cm.figure_.set_dpi(kwargs.get('dpi', 100))
-    cm.figure_.savefig(filepath)
+    return cm
