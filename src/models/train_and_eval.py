@@ -2,6 +2,7 @@ import os
 import json
 from argparse import ArgumentParser
 
+import mlflow
 import numpy as np
 import torch.optim as optim
 from torch import save, load, cuda, device
@@ -87,47 +88,65 @@ if __name__ == '__main__':
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
 
-    # initialize data loaders
-    BATCH_SIZE = params['batch_size']
-    train_loader, val_loader = initialize_loaders(train_dset, BATCH_SIZE)
-    test_loader = DataLoader(test_dset)
+    # start mlflow run
+    with mlflow.start_run() as run:
+        # log hyperparameters
+        mlflow.log_params(params)
+        
+        # initialize data loaders
+        BATCH_SIZE = params['batch_size']
+        train_loader, val_loader = initialize_loaders(train_dset, BATCH_SIZE)
+        test_loader = DataLoader(test_dset)
 
-    # initialize hyperparameters
-    NUM_EPOCHS = params['num_epochs']
-    LR = params['learning_rate']
-    REG = params['weight_decay']
-    GAMMA = params['factor']
-    PAT = params['patience']
+        # initialize other hyperparameters
+        NUM_EPOCHS = params['num_epochs']
+        LR = params['learning_rate']
+        REG = params['weight_decay']
+        GAMMA = params['factor']
+        PAT = params['patience']
 
-    # initialize loss functions
-    criterion1 = CrossEntropyLoss().to(DEVICE)
-    criterion2 = BCEWithLogitsLoss().to(DEVICE)
-    losses = (criterion1, criterion2)
+        # initialize loss functions
+        criterion1 = CrossEntropyLoss().to(DEVICE)
+        criterion2 = BCEWithLogitsLoss().to(DEVICE)
+        losses = (criterion1, criterion2)
 
-    # initialize optimizer and lr-scheduler
-    optimizer = optim.SGD(
-        model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
-    )
+        # initialize optimizer and lr-scheduler
+        optimizer = optim.SGD(
+            model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
+        )
 
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, factor=GAMMA, patience=PAT
-    )
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, factor=GAMMA, patience=PAT
+        )   
 
-    # train model
-    train_results = train_model(model, train_loader, val_loader, optimizer,
-                                losses, NUM_EPOCHS, DEVICE, scheduler)
+        # train model
+        train_results = train_model(model, train_loader, val_loader,
+                                    optimizer, losses, NUM_EPOCHS, DEVICE,
+                                    scheduler)
+        
+        # log training and validation metrics
+        metrics = ('Training loss', 'Validation loss',
+                   'Validation label accuracy', 'Validation is_upp accuracy')
+        for metric, history in zip(metrics, train_results):
+            for value in history:
+                mlflow.log_metric(metric, value)
 
-    # save trained model
-    out_path = os.path.join(ROOT_DIR, args.out_weights_path)
-    save(model.state_dict(), out_path)
-    print(f'\nYour model is saved at {out_path}\n')
 
-    # start model evaluation
-    print(title_template.format('Evaluation started'.center(width)))
-    lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
-    acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
-    print(acc_msg.format('label', lbl_acc))
-    print(acc_msg.format('case', is_upp_acc))
+        # save trained model
+        out_path = os.path.join(ROOT_DIR, args.out_weights_path)
+        save(model.state_dict(), out_path)
+        print(f'\nYour model is saved at {out_path}\n')
+
+        # start model evaluation
+        print(title_template.format('Evaluation started'.center(width)))
+        lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
+        acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
+        print(acc_msg.format('label', lbl_acc))
+        print(acc_msg.format('case', is_upp_acc))
+
+        # log metrics on test dataset
+        mlflow.log_metric('Label accuracy', lbl_acc)
+        mlflow.log_metric('Is upp acuuracy', is_upp_acc)
 
     # create array of true labels
     ground_truth = np.array([(x.item(), y.item()) for _, x, y in test_loader])
