@@ -22,7 +22,6 @@ from ..data.datasets import HandwritingDataset
 
 MEAN = HandwritingClassifier._mean
 STD = HandwritingClassifier._std
-
 # initialize device
 DEVICE = device('cuda') if cuda.is_available() else device('cpu')
 
@@ -54,7 +53,7 @@ if __name__ == '__main__':
     args = parser.parse_args()  # parse cmd arguments
 
     width = os.get_terminal_size()[0]  # get terminal width
-    title_template = '=' * 130 + '\n' + '{}' + '=' * 130 + '\n'
+    title_template = '=' * width + '\n' + '{}' + '=' * width + '\n'
     print(title_template.format('Training started'.center(width)))
 
     # initialize model
