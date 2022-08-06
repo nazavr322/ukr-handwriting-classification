@@ -59,8 +59,9 @@ if __name__ == '__main__':
     # start evaluation run
     with mlflow.start_run(run_name='Evaluation') as run:
         width = os.get_terminal_size()[0]  # get terminal width
-        title_template = '=' * width + '\n' + '{}' + '=' * width + '\n'
-        print(title_template.format('Evaluation started'.center(width)))
+        print(
+            f'{"="*width}\n{"Evaluation started".center(width)}\n{"="*width}\n'
+        )
         
         # compute accuracies
         lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
