@@ -16,7 +16,7 @@ from .functional import (
     initialize_loaders,
     train_model,
     evaluate,
-    save_confusion_matrix,
+    get_confusion_matrix,
 )
 from ..data.datasets import HandwritingDataset
 
@@ -131,9 +131,8 @@ if __name__ == '__main__':
         metrics = ('Training loss', 'Validation loss',
                    'Validation label accuracy', 'Validation is_upp accuracy')
         for metric, history in zip(metrics, train_results):
-            for value in history:
-                mlflow.log_metric(metric, value)
-
+            for epoch, value in enumerate(history):
+                mlflow.log_metric(metric, value, epoch)
 
         # save trained model
         out_path = os.path.join(ROOT_DIR, args.out_weights_path)
@@ -151,30 +150,31 @@ if __name__ == '__main__':
         mlflow.log_metric('Label accuracy', lbl_acc)
         mlflow.log_metric('Is upp accuracy', is_upp_acc)
 
-    # create array of true labels
-    ground_truth = np.array([(x.item(), y.item()) for _, x, y in test_loader])
+        # create array of true labels
+        ground_truth = np.array([(x.item(), y.item()) for _, x, y in test_loader])
 
-    # save confusion matrices
-    labels = list('0123456789абвгґдеєжзиіїйклмнопрстуфхцчшщьюя')
-    full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'lbl_cm.png')
-    save_confusion_matrix(
-        full_path,
-        ground_truth[:, 0],
-        preds[:, 0],
-        labels,
-        'Confusion matrix for label classification',
-        figsize=(14, 14),
-        fontsize=22,
-        dpi=300,
-    )
-    print('\nConfusion matrix is saved at', full_path)
-    full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'is_upp_cm.png')
-    save_confusion_matrix(
-        full_path,
-        ground_truth[:, 1],
-        preds[:, 1],
-        ('lowercase', 'uppercase'),
-        'Confusion matrix for case determination',
-        dpi=300,
-    )
-    print('Confusion matrix is saved at', full_path)
+        # create and log confusion matrices
+        labels = list('0123456789абвгґдеєжзиіїйклмнопрстуфхцчшщьюя')
+        full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'lbl_cm.png')
+        lbl_cm = get_confusion_matrix(
+            ground_truth[:, 0],
+            preds[:, 0],
+            labels,
+            'Confusion matrix for label classification',
+            figsize=(14, 14),
+            fontsize=22,
+            dpi=300,
+        )
+        print('\nConfusion matrix is saved at', full_path)
+        mlflow.log_figure(lbl_cm.figure_, 'reports/figures/lbl_cm.png')
+
+        full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'is_upp_cm.png')
+        is_upp_cm = get_confusion_matrix(
+            ground_truth[:, 1],
+            preds[:, 1],
+            ('lowercase', 'uppercase'),
+            'Confusion matrix for case determination',
+            dpi=300,
+        )
+        print('Confusion matrix is saved at', full_path)
+        mlflow.log_figure(is_upp_cm.figure_, 'reports/figures/is_upp_cm.png')
