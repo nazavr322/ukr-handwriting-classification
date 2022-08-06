@@ -67,7 +67,7 @@ if __name__ == '__main__':
         lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
         acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
         print(acc_msg.format('label', lbl_acc))
-        print(acc_msg.format('case', is_upp_acc))
+        print(acc_msg.format('case', is_upp_acc) + '\n')
 
         # log evaluation metrics
         mlflow.log_metric('Label accuracy', lbl_acc)
@@ -87,9 +87,9 @@ if __name__ == '__main__':
             fontsize=22,
             dpi=300,
         )
-        full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'lbl_cm.png')
-        print('\nConfusion matrix is saved at', full_path)
-        mlflow.log_figure(lbl_cm.figure_, full_path)
+        rel_path = os.path.join(args.out_fig_path, 'lbl_cm.png')
+        print('Confusion matrix is saved at', os.path.join(ROOT_DIR, rel_path))
+        mlflow.log_figure(lbl_cm.figure_, rel_path)
 
         is_upp_cm = get_confusion_matrix(
             gt[:, 1],
@@ -98,6 +98,6 @@ if __name__ == '__main__':
             'Confusion matrix for case determination',
             dpi=300,
         )
-        full_path = os.path.join(ROOT_DIR, args.out_fig_path, 'is_upp_cm.png')
-        print('Confusion matrix is saved at', full_path)
-        mlflow.log_figure(is_upp_cm.figure_, full_path)
+        rel_path = os.path.join(args.out_fig_path, 'is_upp_cm.png')
+        print('Confusion matrix is saved at', os.path.join(ROOT_DIR, rel_path))
+        mlflow.log_figure(is_upp_cm.figure_, rel_path)
