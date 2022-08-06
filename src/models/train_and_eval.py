@@ -88,8 +88,11 @@ if __name__ == '__main__':
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
 
+    # set mlflow experiment
+    mlflow.set_experiment('Multi-output CNN')
+
     # start mlflow run
-    with mlflow.start_run() as run:
+    with mlflow.start_run(run_name='Training and evaluation') as run:
         # log hyperparameters
         mlflow.log_params(params)
         
