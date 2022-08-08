@@ -98,5 +98,32 @@ stages:
       size: 3312672
     outs:
     - path: models/test_run.pt
-      md5: d9070c58e9f60238757d6b0f5841fe8f
+      md5: 68f09681ac595e1f1dbd8a6f7f4a7913
+      size: 3348314
+  train:
+    cmd: python -m src.models.train data/processed/train_data.csv models/mnist_model.pt
+      models/best_params.json models/test_run.pt
+    deps:
+    - path: data/processed/train_data.csv
+      md5: 000b7fd561981101b12365cb85c5f7ee
+      size: 30030
+    - path: models/best_params.json
+      md5: 46cd7d7adbeddc8cb8ab78a5c5836daa
+      size: 249
+    - path: models/mnist_model.pt
+      md5: 888469a8360c8d350bfb7943db4f027d
+      size: 3312672
+    outs:
+    - path: models/test_run.pt
+      md5: e34a10bef3043e0816e908b0351f1c29
+      size: 3348314
+  evaluate:
+    cmd: python -m src.models.evaluate data/processed/test_data.csv models/test_run.pt
+      reports/figures/
+    deps:
+    - path: data/processed/test_data.csv
+      md5: d298ed5f35958344cb2db903757fee52
+      size: 7014
+    - path: models/test_run.pt
+      md5: e34a10bef3043e0816e908b0351f1c29
       size: 3348314
