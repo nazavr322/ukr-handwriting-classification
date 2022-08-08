@@ -64,6 +64,8 @@ if __name__ == '__main__':
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
         params = json.load(f)
 
+    # set mlflow tracking uri
+    mlflow.set_tracking_uri('http://127.0.0.1:5000')
     # set mlflow experiment
     mlflow.set_experiment('Multi-output CNN')
 

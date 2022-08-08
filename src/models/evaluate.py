@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 from src import ROOT_DIR
 from .models import HandwritingClassifier
-from .functional import evaluate, get_confusion_matrix
+from .functional import evaluate_model, get_confusion_matrix, predict
 from ..data.datasets import HandwritingDataset
 
 
@@ -53,6 +53,8 @@ if __name__ == '__main__':
     # initialize dataloader
     test_loader = DataLoader(dataset)
 
+    # set mlflow tracking uri
+    mlflow.set_tracking_uri('http://127.0.0.1:5000')
     # set mlflow experiment
     mlflow.set_experiment('Multi-output CNN')
 
@@ -64,7 +66,7 @@ if __name__ == '__main__':
         )
         
         # compute accuracies
-        lbl_acc, is_upp_acc, preds = evaluate(model, test_loader, DEVICE)
+        lbl_acc, is_upp_acc, preds = evaluate_model(model, test_loader, DEVICE)
         acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
         print(acc_msg.format('label', lbl_acc))
         print(acc_msg.format('case', is_upp_acc) + '\n')
@@ -101,3 +103,21 @@ if __name__ == '__main__':
         rel_path = os.path.join(args.out_fig_path, 'is_upp_cm.png')
         print('Confusion matrix is saved at', os.path.join(ROOT_DIR, rel_path))
         mlflow.log_figure(is_upp_cm.figure_, rel_path)
+
+        # get sample of model input and unprocessed output
+        inp_tensor = dataset[0][0].unsqueeze(0).to(DEVICE)
+        outs = [p.cpu().detach().numpy() for p in predict(model, inp_tensor)]
+        # create model signature
+        numpy_tensor = inp_tensor.cpu().detach().numpy()
+        signature = mlflow.models.infer_signature(
+            {'image': numpy_tensor},
+            {'label_probs': outs[0], 'is_upp_prob': outs[1]}
+        )
+        
+        # log model
+        mlflow.pytorch.log_model(
+            model,
+            args.model_weights_path,
+            signature=signature,
+            input_example=numpy_tensor
+        )  
