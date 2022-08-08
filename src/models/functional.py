@@ -5,6 +5,12 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import ConfusionMatrixDisplay
 
 
+def predict(model, x: torch.Tensor) -> torch.Tensor:
+    """Returns model predictions"""
+    model.eval()
+    return model(x)
+
+
 def initialize_loaders(
     dataset, batch_size: int = 64, val_size: int = 100
 ) -> tuple[DataLoader, ...]:
@@ -113,7 +119,7 @@ def train_model(
     return t_loss_history, v_loss_history, lbl_acc_history, is_upp_acc_history
 
 
-def evaluate(model, loader, device) -> tuple[float, float, np.ndarray]:
+def evaluate_model(model, loader, device) -> tuple[float, float, np.ndarray]:
     """
     Evaluates model by computing accuracies for 2 targets. Also returns numpy
     array of model predictions.
