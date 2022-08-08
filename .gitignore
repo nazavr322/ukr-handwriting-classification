@@ -3,3 +3,9 @@ __pycache__/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+/reports/
+
+# local mlflow runs
+mlruns/
+mlflow.db
