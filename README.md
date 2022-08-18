@@ -1,5 +1,5 @@
 # Project overview   
-This is a simple pet-project to demonstrate some knowledge of DeepLearning and some MLOps practises and processes.   
+This is a simple pet-project to demonstrate some knowledge of Deep Learning and some MLOps practices and processes.   
 The final version will be a web-site where you will be able to draw a ukrainian letter or digit and neural network will recognize it and determine wheter it's lowercase or uppercase (only for letters). All drawn samples will be automatically collected to improve model perfomance in a future.   
 All data versioning, managing and preprocessing is done using DVC. I performed hyperparameter optimization with Optuna and allthe experiment tracking with MLFlow.  
    
