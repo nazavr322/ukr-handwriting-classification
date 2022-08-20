@@ -47,7 +47,7 @@ All data versioning, managing and preprocessing is done using DVC. I performed h
 │   │   └── features.py         <- File with functions to generate new features.
 │   ├── models         <- Scripts to train and evaluate models
 │   │   ├── evaluate.py         <- Script to evaluate trained model on unseen data.
-│   │   └── functional.py       <- File with utility functions used in training and validation.
+│   │   ├── functional.py       <- File with utility functions used in training and validation.
 │   │   ├── models.py           <- File with model architecture definitions.
 │   │   └── train.py            <- Script to train model.
 ├── dvc.lock           <- File required for DVC data versioning.
