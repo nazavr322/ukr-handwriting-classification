@@ -14,7 +14,6 @@ def merge_pictures(glyphs_path: str, mnist_path: str) -> None:
     """ 
     Merges pictures from 2 directories into final directory named
     `data/processed/glyphs`.
-    2 directories are then deleted.
     """
     target_dir = 'data/processed/glyphs/'
     if not os.path.isdir(target_dir):
