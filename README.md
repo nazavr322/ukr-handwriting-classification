@@ -1,4 +1,4 @@
-# Project overview
+# About
 This is a simple pet-project to demonstrate some knowledge of Deep Learning and some MLOps practices and processes.   
 The final version will be a web-site where you will be able to draw a ukrainian letter or digit and neural network will recognize it and determine wheter it's lowercase or uppercase (only for letters). All drawn samples will be automatically collected to improve model perfomance in a future.   
 All data versioning, managing and preprocessing is done using DVC. I performed hyperparameter optimization with Optuna and all the experiment tracking with MLFlow.  
@@ -21,8 +21,6 @@ All data versioning, managing and preprocessing is done using DVC. I performed h
 - [ ] **Frontend**
     - [ ] Create web interface (most likely with streamlit)  
     
-# About
-Below I will go over the various parts of the project, explaining some of the key points.
 ## Project Structure
 ```nohighlight
 ├── README.md          <- The top-level README for developers using this project.
@@ -47,15 +45,13 @@ Below I will go over the various parts of the project, explaining some of the ke
 │   │   ├── split_train_test.py <- Script to perform train/test split.
 │   ├── features       <- Scripts to turn raw data into features for modeling
 │   │   └── features.py         <- File with functions to generate new features.
-│   └── models         <- Scripts to train and evaluate models
-│       ├── evaluate.py         <- Script to evaluate trained model on unseen data.
-│       ├── functional.py       <- File with utility functions used in training and validation.
-│       ├── models.py           <- File with model architecture definitions.
-│       └── train.py            <- Script to train model.
+│   ├── models         <- Scripts to train and evaluate models
+│   │   ├── evaluate.py         <- Script to evaluate trained model on unseen data.
+│   │   └── functional.py       <- File with utility functions used in training and validation.
+│   │   ├── models.py           <- File with model architecture definitions.
+│   │   └── train.py            <- Script to train model.
 ├── dvc.lock           <- File required for DVC data versioning.
 ├── dvc.yaml           <- File with definition of DVC data pre-processing pipeline.
 ├── poetry.lock        <- File that locks project dependencies to their current versions.
 └── pyproject.toml     <- File with project settings.
 ```
-## Data pre-processing and DVC
-
