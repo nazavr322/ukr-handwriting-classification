@@ -59,9 +59,9 @@ Below I will go over the various parts of the project, explaining some of the ke
 ```
 ## Data pre-processing and DVC
 Original dataset was taken from [here](https://www.kaggle.com/datasets/lynnporu/rukopys). It consists of 1081 samples of Ukrainian handwritten letters, both uppercase and lowercase. You can see some examples below:    
-(image of 10 random samples of raw images)    
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/10_raw_samples.png)   
 The key point is that this dataset doesn't have handwritten digits included, so to fix this situation I decided to add 50 samples of each digit (from 0 to 9) to the dataset. Resulting in a following distribution of samples:    
-(image of sample distribution)    
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/data_ditribution.png)    
 Now the question arises how to correctly bring the data from different datasets to a general form. You can find a bunch of pre-processing scripts in a corresponding `src/data` folder, but you don't need to worry about understanding and executing them ccorrectly. I created a DVC pipeline that allows you to go from raw to ready-to-train data using only one command (I'll explain how to do in a corresponding [section](#getting-started)).    
 Our pipeline looks like this:    
 ```mermaid
@@ -92,34 +92,36 @@ flowchart TD
 	node12-->node11
 ```
 Let me break it down for you. As you can see first three steps are executed in parallel:
-    1. **Clean data** - takes raw .csv file with ukrainian handwriting as an input and filters out all unnecessary information for our task.
-    2. **Prepare glyphs** - takes folder containing raw images of ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).
-    3. **Prepare MNIST** - takes folder containing raw byte-encoded MNIST images and produces equal amount of .png images per class, as well as .csv file with metadata about this pictures (label, filename, etc.)
-    4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.
-    5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.
-    6. **Train/test split** - splits .csv file from stage(4) into train and test subsets.
-    7. **Train** - fine-tunes model pre-trained on MNIST on a training data from stage(6).
-    8. **Evaluate** - evaluates trained model from stage(7) on a test subset from stage(6).
+1. **Clean data** - takes raw .csv file with ukrainian handwriting as an input and filters out all unnecessary information for our task.
+2. **Prepare glyphs** - takes folder containing raw images of ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).
+3. **Prepare MNIST** - takes folder containing raw byte-encoded MNIST images and produces equal amount of .png images per class, as well as .csv file with metadata about this pictures (label, filename, etc.)
+4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.
+5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.
+6. **Train/test split** - splits .csv file from stage(4) into train and test subsets.
+7. **Train** - fine-tunes model pre-trained on MNIST on a training data from stage(6).
+8. **Evaluate** - evaluates trained model from stage(7) on a test subset from stage(6).
+
 That's it, even if it looks a little difficult, in fact, all the stages are quite simple. Take a look at how our final images look like after all the processing (without augmentations ofcourse):    
-(picture of 10 processed images)   
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/10_proc_samples.png)   
 ## Model training
 As I've mentioned earlier, actually I've used 2 models to solve my problem. As you can see on the plots above, amount of available data is very little. 1k of unequally distributed samples (33 classes and some of them don't have uppercase analogs at all) doesn't allow us to generalize well. And even if we could, we wouldn't be able to recognize the numbers at all. So, my solution was pretty straightforward, pretrain model on MNIST (because my images are pretty much the same) and then fine-tune to solve multi-output classification problem.
 ### MNIST Model
 MNIST classification problem was solved long time ago, so I have nothing special to say here. With pretty much default hyperparameters I was able to reach `accuracy = 99.39%` only after 25 epochs of training. More than enough for our task. You can see the nn's architecture below:   
-(picture of horizontal mnist model)
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/mnist_model_h.svg)
 ### Multi-output CNN
 Here, I slightly modified the architecture above. Let's see how it looks now:  
-(picure of horizontal complete model)
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/complete_model_h.svg)
 As you can see, I've replaced one classification head with two FCN layers. First has 43 outputs (33 ukrainian letters and 10 digits) and the second one has only 1 output to predict whether sample is uppercase and lowercase.   
 A few words about loss functions, after experimenting with different weighting strategies, to give more weight to a label classification task, I've discovered that one can achieve the most stable training process just summing up to loss functions. Thus, the final loss looked like this: $L = CE + BCE$.    
 All the hyperparameters where fine-tuned with [`optuna`](https://github.com/optuna/optuna) framework, you can ckeckout this code at `notebooks/optuna.ipynb`. In this case `SGD` optimizer with momentum performed better than `Adam`, with `ReduceOnPlateau` lr annealing strategy.
 ## Final Evaluation Results
 After training the model above for 30 epochs, I was able to achieve this results on test dataset of 300 samples:
-    - `Label classification accuracy = 91.64%`
-    - `Is uppercase classification accuracy = 95.65%`
+- `Label classification accuracy = 91.64%`
+- `Is uppercase classification accuracy = 95.65%`
+
 Also, I've prepaired confusion matrices to visualize model predictions:
-(picture of label cm)   
-(picture of is upp cm)
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png)   
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/is_upp_cm.png)
     
     
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metrics values.
