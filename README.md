@@ -16,7 +16,7 @@ All data versioning, managing and preprocessing is done using DVC. I performed h
     - [x] Using transfer learning fine-tune pretrained model to recognize both digits and letters as well as uppercase/lowercase classification (Multi-Output CNN).
 - [ ] **Backend**
     - [x] Add hyperparameter logging and model tracking using MLFlow.
-    - [ ] Create Docker Compose with Minio S3 for artifact storage, PosteSQL for model registry, MLFlow server and backend code with FastAPI
+    - [ ] Create Docker Compose with Minio S3 for artifact storage, PostgreSQL for model registry, MLFlow server and backend code with FastAPI
     - [ ] Deploy Docker container to some cloud VM.
 - [ ] **Frontend**
     - [ ] Create web interface (most likely with streamlit)  
