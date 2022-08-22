@@ -120,8 +120,8 @@ After training the model above for 30 epochs, I was able to achieve this results
 - `Is uppercase classification accuracy = 95.65%`
 
 Also, I've prepaired confusion matrices to visualize model predictions:
-![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png)   
-![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/is_upp_cm.png)
+<img src="https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png">
+<img src="https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/is_upp_cm.png">
     
     
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metrics values.
