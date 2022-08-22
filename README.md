@@ -26,16 +26,23 @@ Below I will go over the various parts of the project, explaining some of the ke
 ## Project Structure
 ```nohighlight
 ├── README.md          <- The top-level README for developers using this project.
+│
 ├── data
 │   ├── interim        <- Intermediate data that has been transformed.
 │   ├── processed      <- The final, canonical data sets for modeling. 
 │   └── raw            <- The original, immutable data .
+│
 ├── models             <- Trained and serialized models, hyperparameters.
+│
 ├── notebooks          <- Jupyter notebooks.
 │   ├── eda_and_viz.ipynb       <- Notebook with EDA and visualizations.
 │   ├── mnist_training.ipynb    <- Notebook with training base model on MNIST data.
 │   ├── model_training.ipynb    <- Notebook with test training of final model.
 │   └── optuna.ipynb            <- Notebook with hyperparameter optimization using Optuna.
+│
+├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
+│   └── figures        <- Generated graphics and figures to be used in reporting
+│
 ├── src                <- Source code for use in this project.
 │   ├── data           <- Scripts related to data processing or generation.
 │   │   ├── clean_data.py       <- Script to drop unneeded columns.
@@ -48,10 +55,10 @@ Below I will go over the various parts of the project, explaining some of the ke
 │   ├── features       <- Scripts to turn raw data into features for modeling
 │   │   └── features.py         <- File with functions to generate new features.
 │   ├── models         <- Scripts to train and evaluate models
-│   │   ├── evaluate.py         <- Script to evaluate trained model on unseen data.
 │   │   ├── functional.py       <- File with utility functions used in training and validation.
 │   │   ├── models.py           <- File with model architecture definitions.
-│   │   └── train.py            <- Script to train model.
+│   │   └── train_and_eval.py            <- Script to train and evaluate the model.
+│
 ├── dvc.lock           <- File required for DVC data versioning.
 ├── dvc.yaml           <- File with definition of DVC data pre-processing pipeline.
 ├── poetry.lock        <- File that locks project dependencies to their current versions.
@@ -70,26 +77,23 @@ flowchart TD
 	node2["data/raw/MNIST.dvc"]
 	node3["data/raw/glyphs.csv.dvc"]
 	node4["data/raw/glyphs.dvc"]
-	node5["evaluate"]
-	node6["make_dataset"]
-	node7["merge_pictures"]
-	node8["models/mnist_model.pt.dvc"]
-	node9["prepare_glyphs"]
-	node10["prepare_mnist"]
-	node11["train"]
-	node12["train_test_split"]
-	node1-->node6
-	node2-->node10
+	node5["make_dataset"]
+	node6["merge_pictures"]
+	node7["models/mnist_model.pt.dvc"]
+	node8["prepare_glyphs"]
+	node9["prepare_mnist"]
+	node10["train_and_evaluate"]
+	node11["train_test_split"]
+	node1-->node5
+	node2-->node9
 	node3-->node1
-	node4-->node9
-	node6-->node12
-	node8-->node11
-	node9-->node7
-	node10-->node6
-	node10-->node7
-	node11-->node5
-	node12-->node5
-	node12-->node11
+	node4-->node8
+	node5-->node11
+	node7-->node10
+	node8-->node6
+	node9-->node5
+	node9-->node6
+	node11-->node10
 ```
 Let me break it down for you. As you can see first three steps are executed in parallel:
 1. **Clean data** - takes raw .csv file with ukrainian handwriting as an input and filters out all unnecessary information for our task.
@@ -98,8 +102,7 @@ Let me break it down for you. As you can see first three steps are executed in p
 4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.
 5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.
 6. **Train/test split** - splits .csv file from stage(4) into train and test subsets.
-7. **Train** - fine-tunes model pre-trained on MNIST on a training data from stage(6).
-8. **Evaluate** - evaluates trained model from stage(7) on a test subset from stage(6).
+7. **Train and evaluate** - fine-tunes model pre-trained on MNIST on a training data from stage(6) and evaluates it's perfomance on test data also from stage(6).
 
 That's it, even if it looks a little difficult, in fact, all the stages are quite simple. Take a look at how our final images look like after all the processing (without augmentations ofcourse):    
 ![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/10_proc_samples.png)   
@@ -120,8 +123,8 @@ After training the model above for 30 epochs, I was able to achieve this results
 - `Is uppercase classification accuracy = 95.65%`
 
 Also, I've prepaired confusion matrices to visualize model predictions:
-<img src="https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png">
-<img src="https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/is_upp_cm.png">
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png)
+![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/is_upp_cm.png)
     
     
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metrics values.
