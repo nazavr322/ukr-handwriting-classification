@@ -27,10 +27,6 @@ def create_parser() -> ArgumentParser:
         'model_weights_path',
         help='.pt file with the weights of a Multi-Output CNN',
     )
-    parser.add_argument(
-        'out_fig_path',
-        help='path to a directory where figure artifacts will be stored',
-    )
     return parser
 
 
@@ -38,14 +34,6 @@ if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()  # parse cmd arguments
     
-    # initialize model
-    model = HandwritingClassifier()
-    model.load_state_dict(
-        load(os.path.join(ROOT_DIR, args.model_weights_path)),
-        strict=False,
-    )
-    model.to(DEVICE)
-
     # initialize test dataset
     tfs = T.Compose([T.ToTensor(), T.Normalize(mean=MEAN, std=STD)])
     dataset = HandwritingDataset(os.path.join(ROOT_DIR, args.test_path), tfs)
@@ -65,6 +53,13 @@ if __name__ == '__main__':
             f'{"="*width}\n{"Evaluation started".center(width)}\n{"="*width}\n'
         )
         
+        # initialize model
+        model = HandwritingClassifier()
+        model.load_state_dict(
+            load(os.path.join(ROOT_DIR, args.model_weights_path))
+        )
+        model.to(DEVICE)
+        
         # compute accuracies
         lbl_acc, is_upp_acc, preds = evaluate_model(model, test_loader, DEVICE)
         acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
@@ -76,7 +71,7 @@ if __name__ == '__main__':
         mlflow.log_metric('Is upp accuracy', is_upp_acc)
 
         # create array of true labels
-        gt = np.array([(x.item(), y.item()) for _, x, y in test_loader])
+        gt = np.array([(lbl.item(), is_upp.item()) for _, lbl, is_upp in test_loader])
         
         # create and log confusion matrices
         labels = list('0123456789абвгґдеєжзиіїйклмнопрстуфхцчшщьюя')
@@ -89,35 +84,33 @@ if __name__ == '__main__':
             fontsize=22,
             dpi=300,
         )
-        rel_path = os.path.join(args.out_fig_path, 'lbl_cm.png')
-        print('Confusion matrix is saved at', os.path.join(ROOT_DIR, rel_path))
-        mlflow.log_figure(lbl_cm.figure_, rel_path)
+        mlflow.log_figure(lbl_cm.figure_, 'figures/lbl_cm.png')
+        print('Confusion matrix successfully logged!')
 
         is_upp_cm = get_confusion_matrix(
             gt[:, 1],
             preds[:, 1],
             ('lowercase', 'uppercase'),
-            'Confusion matrix for case determination',
+            'Confusion matrix for case classification',
             dpi=300,
         )
-        rel_path = os.path.join(args.out_fig_path, 'is_upp_cm.png')
-        print('Confusion matrix is saved at', os.path.join(ROOT_DIR, rel_path))
-        mlflow.log_figure(is_upp_cm.figure_, rel_path)
+        mlflow.log_figure(is_upp_cm.figure_, 'figures/is_upp_cm.png')
+        print('Confusion matrix successfully logged!')
 
         # get sample of model input and unprocessed output
         inp_tensor = dataset[0][0].unsqueeze(0).to(DEVICE)
         outs = [p.cpu().detach().numpy() for p in predict(model, inp_tensor)]
         # create model signature
-        numpy_tensor = inp_tensor.cpu().detach().numpy()
+        np_inp_tensor = inp_tensor.cpu().detach().numpy()
         signature = mlflow.models.infer_signature(
-            {'image': numpy_tensor},
+            {'image': np_inp_tensor},
             {'label_probs': outs[0], 'is_upp_prob': outs[1]}
         )
         
         # log model
         mlflow.pytorch.log_model(
             model,
-            args.model_weights_path,
+            'multi_output_cnn',
             signature=signature,
-            input_example=numpy_tensor
+            input_example=np_inp_tensor
         )  
