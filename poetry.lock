@@ -97,6 +97,14 @@ python-versions = ">=3.6"
 vine = ">=5.0.0"
 
 [[package]]
+name = "antlr4-python3-runtime"
+version = "4.9.3"
+description = "ANTLR 4.9.3 runtime for Python 3.7"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -700,29 +708,31 @@ pgp = ["gpg"]
 
 [[package]]
 name = "dvc"
-version = "2.16.0"
+version = "2.19.0"
 description = "Git for data scientists - manage your code and data together"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.dependencies]
-aiobotocore = {version = ">2", extras = ["boto3"], optional = true, markers = "extra == \"s3\""}
 aiohttp-retry = ">=2.4.5"
 appdirs = ">=1.4.3"
 colorama = ">=0.3.9"
 configobj = ">=5.0.6"
 distro = ">=1.3.0"
 dpath = ">=2.0.2,<3"
-dvc-data = "0.1.6"
+dvc-data = "0.1.22"
+dvc-http = "0.0.2"
 dvc-render = "0.0.9"
-dvc-task = "0.1.0"
+dvc-s3 = {version = "0.0.2", optional = true, markers = "extra == \"s3\""}
+dvc-task = "0.1.2"
 dvclive = ">=0.10.0"
 flatten-dict = ">=0.4.1,<1"
 "flufl.lock" = ">=5"
 fsspec = {version = ">=2021.10.1", extras = ["http"]}
 funcy = ">=1.14"
 grandalf = "0.6"
+hydra-core = ">=1.1.0"
 networkx = ">=2.5"
 packaging = ">=19.0"
 pathspec = ">=0.9.0,<0.10.0"
@@ -730,90 +740,94 @@ psutil = ">=5.8.0"
 pydot = ">=1.2.4"
 pygtrie = ">=2.3.2"
 pyparsing = ">=2.4.7"
-python-benedict = ">=0.24.2"
 requests = ">=2.22.0"
 rich = ">=10.13.0"
 "ruamel.yaml" = ">=0.17.11"
-s3fs = {version = ">=2022.02.0", extras = ["boto3"], optional = true, markers = "extra == \"s3\""}
 scmrepo = "0.0.25"
 shortuuid = ">=0.5.0"
 shtab = ">=1.3.4,<2"
 tabulate = ">=0.8.7"
-toml = ">=0.10.1"
+tomlkit = ">=0.11.1"
 tqdm = ">=4.63.1,<5"
 typing-extensions = ">=3.7.4"
 voluptuous = ">=0.11.7"
 "zc.lockfile" = ">=1.2.1"
 
 [package.extras]
-all = ["adlfs (>=2021.10.0)", "azure-identity (>=1.4.0)", "knack", "pydrive2[fsspec] (>=1.10.1)", "gcsfs (>=2021.11.1)", "pyarrow (>=1)", "fsspec", "ossfs (>=2021.8.0)", "s3fs[boto3] (>=2022.02.0)", "aiobotocore[boto3] (>2)", "bcrypt", "sshfs[bcrypt] (>=2022.6.0)", "webdav4 (>=0.9.3)"]
-azure = ["adlfs (>=2021.10.0)", "azure-identity (>=1.4.0)", "knack"]
-dev = ["adlfs (>=2021.10.0)", "azure-identity (>=1.4.0)", "knack", "pydrive2[fsspec] (>=1.10.1)", "gcsfs (>=2021.11.1)", "pyarrow (>=1)", "fsspec", "ossfs (>=2021.8.0)", "s3fs[boto3] (>=2022.02.0)", "aiobotocore[boto3] (>2)", "bcrypt", "sshfs[bcrypt] (>=2022.6.0)", "webdav4 (>=0.9.3)", "tpi[ssh] (>=2.1.0)", "dvc-ssh (==0.0.1a0)", "pytest (==7.1.2)", "pytest-cov (==3.0.0)", "pytest-xdist (==2.5.0)", "pytest-mock (==3.8.2)", "pytest-lazy-fixture (==0.6.3)", "pytest-test-utils (==0.0.8)", "flaky (==3.7.0)", "mock (==4.0.3)", "pytest-timeout (==2.1.0)", "filelock (==3.7.1)", "pylint (==2.14.5)", "pylint-pytest (==1.1.2)", "pylint-plugin-utils (==0.7)", "mypy (==0.971)", "types-requests (>=2.27.15)", "types-tabulate (>=0.8.6)", "types-toml (>=0.10.4)", "dvclive[image] (>=0.7.3)", "beautifulsoup4 (==4.11.1)", "dvc-data", "pytest-docker (==0.11.0)", "pywin32 (>=225)"]
-gdrive = ["pydrive2[fsspec] (>=1.10.1)"]
-gs = ["gcsfs (>=2021.11.1)"]
-hdfs = ["pyarrow (>=1)", "fsspec"]
-oss = ["ossfs (>=2021.8.0)"]
-s3 = ["s3fs[boto3] (>=2022.02.0)", "aiobotocore[boto3] (>2)"]
-ssh = ["bcrypt", "sshfs[bcrypt] (>=2022.6.0)"]
-ssh_gssapi = ["sshfs[gssapi] (>=2022.6.0)"]
+all = ["dvc-azure (==0.0.1)", "dvc-gdrive (==0.0.1)", "dvc-gs (==0.0.1)", "dvc-hdfs (==0.0.1)", "dvc-oss (==0.0.1)", "dvc-s3 (==0.0.2)", "dvc-ssh (==0.0.1)", "dvc-webdav (==0.0.1)", "dvc-webhdfs (==0.0.2)"]
+azure = ["dvc-azure (==0.0.1)"]
+dev = ["dvc-azure (==0.0.1)", "dvc-gdrive (==0.0.1)", "dvc-gs (==0.0.1)", "dvc-hdfs (==0.0.1)", "dvc-oss (==0.0.1)", "dvc-s3 (==0.0.2)", "dvc-ssh (==0.0.1)", "dvc-webdav (==0.0.1)", "dvc-webhdfs (==0.0.2)", "tpi[ssh] (>=2.1.0)", "pytest (==7.1.2)", "pytest-cov (==3.0.0)", "pytest-xdist (==2.5.0)", "pytest-mock (==3.8.2)", "pytest-lazy-fixture (==0.6.3)", "pytest-test-utils (==0.0.8)", "flaky (==3.7.0)", "mock (==4.0.3)", "pytest-timeout (==2.1.0)", "filelock (==3.8.0)", "pylint (==2.14.5)", "pylint-pytest (==1.1.2)", "pylint-plugin-utils (==0.7)", "mypy (==0.971)", "types-requests (>=2.27.15)", "types-tabulate (>=0.8.6)", "types-toml (>=0.10.4)", "dvclive[image] (>=0.7.3)", "beautifulsoup4 (==4.11.1)", "dvc-data", "pytest-docker (==0.11.0)", "pywin32 (>=225)"]
+gdrive = ["dvc-gdrive (==0.0.1)"]
+gs = ["dvc-gs (==0.0.1)"]
+hdfs = ["dvc-hdfs (==0.0.1)"]
+oss = ["dvc-oss (==0.0.1)"]
+s3 = ["dvc-s3 (==0.0.2)"]
+ssh = ["dvc-ssh (==0.0.1)"]
+ssh_gssapi = ["dvc-ssh[gssapi] (==0.0.1)"]
 terraform = ["tpi[ssh] (>=2.1.0)"]
-tests = ["tpi[ssh] (>=2.1.0)", "dvc-ssh (==0.0.1a0)", "pytest (==7.1.2)", "pytest-cov (==3.0.0)", "pytest-xdist (==2.5.0)", "pytest-mock (==3.8.2)", "pytest-lazy-fixture (==0.6.3)", "pytest-test-utils (==0.0.8)", "flaky (==3.7.0)", "mock (==4.0.3)", "pytest-timeout (==2.1.0)", "filelock (==3.7.1)", "pylint (==2.14.5)", "pylint-pytest (==1.1.2)", "pylint-plugin-utils (==0.7)", "mypy (==0.971)", "types-requests (>=2.27.15)", "types-tabulate (>=0.8.6)", "types-toml (>=0.10.4)", "dvclive[image] (>=0.7.3)", "beautifulsoup4 (==4.11.1)", "pytest-docker (==0.11.0)", "pywin32 (>=225)"]
-webdav = ["webdav4 (>=0.9.3)"]
-webhdfs_kerberos = ["requests-kerberos (==0.14.0)"]
+tests = ["tpi[ssh] (>=2.1.0)", "dvc-ssh (==0.0.1)", "pytest (==7.1.2)", "pytest-cov (==3.0.0)", "pytest-xdist (==2.5.0)", "pytest-mock (==3.8.2)", "pytest-lazy-fixture (==0.6.3)", "pytest-test-utils (==0.0.8)", "flaky (==3.7.0)", "mock (==4.0.3)", "pytest-timeout (==2.1.0)", "filelock (==3.8.0)", "pylint (==2.14.5)", "pylint-pytest (==1.1.2)", "pylint-plugin-utils (==0.7)", "mypy (==0.971)", "types-requests (>=2.27.15)", "types-tabulate (>=0.8.6)", "types-toml (>=0.10.4)", "dvclive[image] (>=0.7.3)", "beautifulsoup4 (==4.11.1)", "pytest-docker (==0.11.0)", "pywin32 (>=225)"]
+webdav = ["dvc-webdav (==0.0.1)"]
+webhdfs = ["dvc-webhdfs (==0.0.2)"]
+webhdfs_kerberos = ["dvc-webhdfs[kerberos] (==0.0.2)"]
 
 [[package]]
 name = "dvc-data"
-version = "0.1.6"
+version = "0.1.22"
 description = "dvc data"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.dependencies]
+attrs = ">=21.3.0"
 dictdiffer = ">=0.8.1"
 diskcache = ">=5.2.1"
-dvc-objects = "0.1.6"
+dvc-objects = "0.1.16"
 funcy = ">=1.14"
 nanotime = ">=0.5.2"
 pygtrie = ">=2.3.2"
 shortuuid = ">=0.5.0"
 
 [package.extras]
-tests = ["pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
-dev = ["blake3 (>=0.3.1)", "pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)", "rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
-cli = ["rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
-all = ["rich (>=10.11.0,<13.0.0)", "typer[rich] (>=0.6)"]
+all = ["typer[all] (>=0.6)", "rich (>=10.11.0,<13.0.0)"]
+cli = ["typer[all] (>=0.6)", "rich (>=10.11.0,<13.0.0)"]
+dev = ["typer[all] (>=0.6)", "rich (>=10.11.0,<13.0.0)", "pytest (==7.1.2)", "pytest-sugar (==0.9.5)", "pytest-cov (==3.0.0)", "pytest-benchmark (==3.4.1)", "pytest-mock (==3.8.2)", "pylint (==2.14.5)", "mypy (==0.971)", "pytest-servers (==0.0.8)", "blake3 (>=0.3.1)", "pytest-servers[s3] (==0.0.8)"]
+tests = ["pytest (==7.1.2)", "pytest-sugar (==0.9.5)", "pytest-cov (==3.0.0)", "pytest-benchmark (==3.4.1)", "pytest-mock (==3.8.2)", "pylint (==2.14.5)", "mypy (==0.971)", "pytest-servers (==0.0.8)", "pytest-servers[s3] (==0.0.8)"]
+
+[[package]]
+name = "dvc-http"
+version = "0.0.2"
+description = "http plugin for dvc"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+aiohttp-retry = ">=2.5.0"
+dvc = "*"
+fsspec = "*"
+
+[package.extras]
+tests = ["pywin32 (>=225)", "types-toml (==0.10.1)", "types-tabulate (==0.8.3)", "types-requests (==2.25.11)", "mypy (==0.910)", "pylint-plugin-utils (==0.6)", "pylint-pytest (==1.1.2)", "pylint (==2.11.1)", "pydocstyle (==6.1.1)", "collective.checkdocs (==0.2)", "Pygments (==2.10.0)", "xmltodict (==0.12.0)", "crc32c (==2.2.post0)", "wsgidav (==3.1.1)", "filelock (==3.3.2)", "wget (==3.2)", "rangehttpserver (==1.2.0)", "mock (==4.0.3)", "flaky (==3.7.0)", "pytest-docker (==0.10.3)", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==3.6.1)", "pytest-xdist (==2.4.0)", "pytest-cov (==3.0.0)", "pytest (==6.2.5)", "dvc", "wheel (==0.37.0)"]
 
 [[package]]
 name = "dvc-objects"
-version = "0.1.6"
+version = "0.1.16"
 description = "dvc objects"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.dependencies]
-flatten-dict = ">=0.4.1,<1"
 fsspec = ">=2021.10.1"
 funcy = ">=1.14"
-pygtrie = ">=2.3.2"
 shortuuid = ">=0.5.0"
 tqdm = ">=4.63.1,<5"
 typing-extensions = ">=3.7.4"
 
 [package.extras]
-webdav = ["webdav4 (>=0.9.3)"]
-tests = ["pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
-ssh = ["sshfs[bcrypt] (>=2021.11.2)", "bcrypt"]
-s3 = ["aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)"]
-oss = ["ossfs (>=2021.8.0)"]
-http = ["aiohttp-retry (>=2.4.5)"]
-hdfs = ["fsspec", "pyarrow (>=1)"]
-gs = ["gcsfs (>=2021.11.1)"]
-gdrive = ["pydrive2[fsspec] (>=1.14.0)"]
-dev = ["fsspec", "pyarrow (>=1)", "webdav4 (>=0.9.3)", "sshfs[bcrypt] (>=2021.11.2)", "bcrypt", "aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)", "ossfs (>=2021.8.0)", "aiohttp-retry (>=2.4.5)", "gcsfs (>=2021.11.1)", "pydrive2[fsspec] (>=1.14.0)", "knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)", "pytest-servers[s3] (==0.0.8)", "mypy (==0.971)", "pylint (==2.14.5)", "pytest-mock (==3.8.2)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.5)", "pytest (==7.1.2)"]
-azure = ["knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)"]
-all = ["fsspec", "pyarrow (>=1)", "webdav4 (>=0.9.3)", "sshfs[bcrypt] (>=2021.11.2)", "bcrypt", "aiobotocore[boto3] (>2)", "s3fs[boto3] (>=2022.02.0)", "ossfs (>=2021.8.0)", "aiohttp-retry (>=2.4.5)", "gcsfs (>=2021.11.1)", "pydrive2[fsspec] (>=1.14.0)", "knack", "azure-identity (>=1.4.0)", "adlfs (>=2021.10.0)"]
+dev = ["pytest (==7.1.2)", "pytest-sugar (==0.9.5)", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pylint (==2.14.5)", "mypy (==0.971)", "pytest-servers (==0.0.8)"]
+tests = ["pytest (==7.1.2)", "pytest-sugar (==0.9.5)", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pylint (==2.14.5)", "mypy (==0.971)", "pytest-servers (==0.0.8)"]
 
 [[package]]
 name = "dvc-render"
@@ -834,24 +848,41 @@ docs = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdo
 dev = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)", "pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.14.1)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "funcy (>=1.17)", "matplotlib", "tabulate (>=0.8.7)"]
 
 [[package]]
+name = "dvc-s3"
+version = "0.0.2"
+description = "s3 plugin for dvc"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+aiobotocore = {version = ">1.0.1", extras = ["boto3"]}
+dvc = "*"
+flatten-dict = ">=0.4.1,<1"
+s3fs = ">=2021.11.0"
+
+[package.extras]
+tests = ["pywin32 (>=225)", "types-toml (==0.10.1)", "types-tabulate (==0.8.3)", "types-requests (==2.25.11)", "mypy (==0.910)", "pylint-plugin-utils (==0.6)", "pylint-pytest (==1.1.2)", "pylint (==2.11.1)", "pydocstyle (==6.1.1)", "collective.checkdocs (==0.2)", "Pygments (==2.10.0)", "xmltodict (==0.12.0)", "filelock (==3.3.2)", "wget (==3.2)", "mock (==4.0.3)", "flaky (==3.7.0)", "pytest-docker (==0.10.3)", "pytest-lazy-fixture (==0.6.3)", "pytest-mock (==3.6.1)", "pytest-xdist (==2.4.0)", "pytest-cov (==3.0.0)", "pytest (==6.2.5)", "dvc", "wheel (==0.37.0)"]
+
+[[package]]
 name = "dvc-task"
-version = "0.1.0"
+version = "0.1.2"
 description = "Extensible task queue used in DVC."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 
 [package.dependencies]
-celery = ">=5.3.0a1,<6"
+celery = ">=5.2.0,<6"
 funcy = ">=1.17"
-kombu = ">=5.3.0a1"
+kombu = ">=5.2.0,<6"
 pywin32 = {version = ">=225", markers = "sys_platform == \"win32\""}
 shortuuid = ">=1.0.8"
 
 [package.extras]
-tests = ["celery-types (>=0.11.0)", "pytest-celery", "pytest-test-utils (>=0.0.6)", "mypy (==0.950)", "pylint (==2.13.9)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "flaky (==3.7.0)"]
-docs = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)"]
-dev = ["mkdocstrings-python (==0.7.0)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.2.15)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)", "celery-types (>=0.11.0)", "pytest-celery", "pytest-test-utils (>=0.0.6)", "mypy (==0.950)", "pylint (==2.13.9)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "flaky (==3.7.0)"]
+tests = ["celery-types (>=0.11.0)", "pytest-celery", "pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.14.3)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "flaky (==3.7.0)"]
+docs = ["mkdocstrings-python (==0.7.1)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.3.7)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)"]
+dev = ["mkdocstrings-python (==0.7.1)", "mkdocs-section-index (==0.3.4)", "mkdocs-material (==8.3.7)", "mkdocs-gen-files (==0.3.4)", "mkdocs (==1.3.0)", "celery-types (>=0.11.0)", "pytest-celery", "pytest-test-utils (>=0.0.6)", "mypy (==0.961)", "pylint (==2.14.3)", "pytest-mock (==3.7.0)", "pytest-cov (==3.0.0)", "pytest-sugar (==0.9.4)", "pytest (==7.1.2)", "flaky (==3.7.0)"]
 
 [[package]]
 name = "dvclive"
@@ -1027,17 +1058,6 @@ ssh = ["paramiko"]
 tqdm = ["tqdm"]
 
 [[package]]
-name = "ftfy"
-version = "6.1.1"
-description = "Fixes mojibake and other problems with Unicode, after the fact"
-category = "main"
-optional = false
-python-versions = ">=3.7,<4"
-
-[package.dependencies]
-wcwidth = ">=0.2.5"
-
-[[package]]
 name = "funcy"
 version = "1.17"
 description = "A fancy and practical functional tools"
@@ -1114,6 +1134,19 @@ eventlet = ["eventlet (>=0.24.1)"]
 gevent = ["gevent (>=1.4.0)"]
 setproctitle = ["setproctitle"]
 tornado = ["tornado (>=0.2)"]
+
+[[package]]
+name = "hydra-core"
+version = "1.2.0"
+description = "A framework for elegantly configuring complex applications"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+antlr4-python3-runtime = ">=4.9.0,<4.10.0"
+omegaconf = ">=2.2,<3.0"
+packaging = "*"
 
 [[package]]
 name = "idna"
@@ -1382,14 +1415,6 @@ sqlalchemy = ["sqlalchemy"]
 sqs = ["boto3 (>=1.22.2)", "pycurl (>=7.44.1,<7.45.0)", "urllib3 (>=1.26.9)"]
 yaml = ["PyYAML (>=3.10)"]
 zookeeper = ["kazoo (>=2.8.0)"]
-
-[[package]]
-name = "mailchecker"
-version = "4.1.19"
-description = "Cross-language email validation. Backed by a database of thousands throwable email providers."
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "mako"
@@ -1667,6 +1692,18 @@ signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
+name = "omegaconf"
+version = "2.2.3"
+description = "A flexible configuration library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+antlr4-python3-runtime = ">=4.9.0,<4.10.0"
+PyYAML = ">=5.1.0"
+
+[[package]]
 name = "opencv-python"
 version = "4.6.0.66"
 description = "Wrapper package for OpenCV python bindings."
@@ -1792,14 +1829,6 @@ python-versions = "*"
 
 [package.dependencies]
 ptyprocess = ">=0.5"
-
-[[package]]
-name = "phonenumbers"
-version = "8.12.52"
-description = "Python version of Google's common library for parsing, formatting, storing and validating international phone numbers."
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "pickleshare"
@@ -2039,26 +2068,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "python-benedict"
-version = "0.25.2"
-description = "python-benedict is a dict subclass with keylist/keypath support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xml, yaml) and many utilities... for humans, obviously."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-ftfy = ">=6.0.0,<7.0.0"
-mailchecker = ">=4.1.0,<5.0.0"
-phonenumbers = ">=8.12.0,<9.0.0"
-python-dateutil = ">=2.8.0,<3.0.0"
-python-fsutil = ">=0.6.0,<1.0.0"
-python-slugify = ">=6.0.1,<7.0.0"
-pyyaml = ">=6.0,<7.0"
-requests = ">=2.26.0,<3.0.0"
-toml = ">=0.10.2,<1.0.0"
-xmltodict = ">=0.12.0,<1.0.0"
-
-[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -2070,26 +2079,15 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 six = ">=1.5"
 
 [[package]]
-name = "python-fsutil"
-version = "0.6.1"
-description = "file-system utilities for lazy devs."
+name = "python-dotenv"
+version = "0.20.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
 category = "main"
 optional = false
-python-versions = "*"
-
-[[package]]
-name = "python-slugify"
-version = "6.1.2"
-description = "A Python slugify application that also handles Unicode"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
-
-[package.dependencies]
-text-unidecode = ">=1.3"
+python-versions = ">=3.5"
 
 [package.extras]
-unidecode = ["Unidecode (>=1.1.1)"]
+cli = ["click (>=5.0)"]
 
 [[package]]
 name = "pytz"
@@ -2464,14 +2462,6 @@ tornado = ">=6.1.0"
 test = ["pre-commit", "pytest-timeout", "pytest (>=6.0)"]
 
 [[package]]
-name = "text-unidecode"
-version = "1.3"
-description = "The most basic Text::Unidecode port"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "threadpoolctl"
 version = "3.1.0"
 description = "threadpoolctl"
@@ -2495,20 +2485,20 @@ doc = ["sphinx", "sphinx-rtd-theme"]
 test = ["pytest", "pytest-cov", "pytest-flake8", "pytest-isort", "coverage"]
 
 [[package]]
-name = "toml"
-version = "0.10.2"
-description = "Python Library for Tom's Obvious, Minimal Language"
-category = "main"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "tomlkit"
+version = "0.11.4"
+description = "Style preserving TOML library"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
 
 [[package]]
 name = "torch"
@@ -2698,14 +2688,6 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [[package]]
-name = "xmltodict"
-version = "0.13.0"
-description = "Makes working with XML feel like you are working with JSON"
-category = "main"
-optional = false
-python-versions = ">=3.4"
-
-[[package]]
 name = "yarl"
 version = "1.7.2"
 description = "Yet another URL library"
@@ -2743,7 +2725,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "48a3b5907e065589cba658e8e79bd68c503cf7e65ea4edf25430b065c69aecc3"
+content-hash = "e6b4a34546652579a3fdefbabb17535fac7b279c76f176357b30de11014e8ee7"
 
 [metadata.files]
 aiobotocore = []
@@ -2753,6 +2735,7 @@ aioitertools = []
 aiosignal = []
 alembic = []
 amqp = []
+antlr4-python3-runtime = []
 appdirs = []
 appnope = [
     {file = "appnope-0.1.3-py2.py3-none-any.whl", hash = "sha256:265a455292d0bd8a72453494fa24df5a11eb18373a60c7c0430889f22548605e"},
@@ -2927,8 +2910,10 @@ dpath = []
 dulwich = []
 dvc = []
 dvc-data = []
+dvc-http = []
 dvc-objects = []
 dvc-render = []
+dvc-s3 = []
 dvc-task = []
 dvclive = []
 entrypoints = [
@@ -2947,7 +2932,6 @@ flatten-dict = []
 fonttools = []
 frozenlist = []
 fsspec = []
-ftfy = []
 funcy = []
 future = []
 gitdb = []
@@ -2955,6 +2939,7 @@ gitpython = []
 grandalf = []
 greenlet = []
 gunicorn = []
+hydra-core = []
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
@@ -2994,7 +2979,6 @@ jupyterlab-pygments = [
 jupyterlab-widgets = []
 kiwisolver = []
 kombu = []
-mailchecker = []
 mako = []
 markupsafe = [
     {file = "MarkupSafe-2.1.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:86b1f75c4e7c2ac2ccdaec2b9022845dbb81880ca318bb7a0a01fbf7813e3812"},
@@ -3111,6 +3095,7 @@ notebook = [
 ]
 numpy = []
 oauthlib = []
+omegaconf = []
 opencv-python = []
 optuna = []
 packaging = [
@@ -3154,7 +3139,6 @@ pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
     {file = "pexpect-4.8.0.tar.gz", hash = "sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"},
 ]
-phonenumbers = []
 pickleshare = [
     {file = "pickleshare-0.7.5-py2.py3-none-any.whl", hash = "sha256:9649af414d74d4df115d5d718f82acb59c9d418196b7b4290ed47a12ce62df56"},
     {file = "pickleshare-0.7.5.tar.gz", hash = "sha256:87683d47965c1da65cdacaf31c8441d12b8044cdec9aca500cd78fc2c683afca"},
@@ -3320,13 +3304,11 @@ pyrsistent = [
     {file = "pyrsistent-0.18.1-cp39-cp39-win_amd64.whl", hash = "sha256:e24a828f57e0c337c8d8bb9f6b12f09dfdf0273da25fda9e314f0b684b415a07"},
     {file = "pyrsistent-0.18.1.tar.gz", hash = "sha256:d4d61f8b993a7255ba714df3aca52700f8125289f84f704cf80916517c46eb96"},
 ]
-python-benedict = []
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
-python-fsutil = []
-python-slugify = []
+python-dotenv = []
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
     {file = "pytz-2022.1.tar.gz", hash = "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7"},
@@ -3477,7 +3459,6 @@ terminado = [
     {file = "terminado-0.15.0-py3-none-any.whl", hash = "sha256:0d5f126fbfdb5887b25ae7d9d07b0d716b1cc0ccaacc71c1f3c14d228e065197"},
     {file = "terminado-0.15.0.tar.gz", hash = "sha256:ab4eeedccfcc1e6134bfee86106af90852c69d602884ea3a1e8ca6d4486e9bfe"},
 ]
-text-unidecode = []
 threadpoolctl = [
     {file = "threadpoolctl-3.1.0-py3-none-any.whl", hash = "sha256:8b99adda265feb6773280df41eece7b2e6561b772d21ffd52e372f999024907b"},
     {file = "threadpoolctl-3.1.0.tar.gz", hash = "sha256:a335baacfaa4400ae1f0d8e3a58d6674d2f8828e3716bb2802c44955ad391380"},
@@ -3486,11 +3467,11 @@ tinycss2 = [
     {file = "tinycss2-1.1.1-py3-none-any.whl", hash = "sha256:fe794ceaadfe3cf3e686b22155d0da5780dd0e273471a51846d0a02bc204fec8"},
     {file = "tinycss2-1.1.1.tar.gz", hash = "sha256:b2e44dd8883c360c35dd0d1b5aad0b610e5156c2cb3b33434634e539ead9d8bf"},
 ]
-toml = []
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
 ]
+tomlkit = []
 torch = [
     {file = "torch-1.12.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:3322d33a06e440d715bb214334bd41314c94632d9a2f07d22006bf21da3a2be4"},
     {file = "torch-1.12.0-cp310-cp310-manylinux2014_aarch64.whl", hash = "sha256:2568f011dddeb5990d8698cc375d237f14568ffa8489854e3b94113b4b6b7c8b"},
@@ -3593,7 +3574,6 @@ websocket-client = []
 werkzeug = []
 widgetsnbextension = []
 wrapt = []
-xmltodict = []
 yarl = []
 "zc.lockfile" = []
 zipp = []
