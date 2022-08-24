@@ -10,6 +10,7 @@ import torch.optim as optim
 from torch import load, cuda, device
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.utils.data import DataLoader
+from dotenv import load_dotenv
 
 from src import ROOT_DIR
 from .models import HandwritingClassifier
@@ -41,6 +42,8 @@ def create_parser() -> ArgumentParser:
 if __name__ == '__main__':
     parser = create_parser()
     args = parser.parse_args()  # parse cmd arguments
+    
+    load_dotenv()  # load environmental variables
 
     # initialize device
     DEVICE = device('cuda') if cuda.is_available() else device('cpu')
@@ -77,8 +80,6 @@ if __name__ == '__main__':
     )
     model.to(DEVICE)
 
-    # set mlflow tracking uri
-    mlflow.set_tracking_uri('http://127.0.0.1:5000')
     # set mlflow experiment
     mlflow.set_experiment('Multi-output CNN')
 
