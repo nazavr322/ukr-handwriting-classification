@@ -3,4 +3,4 @@
 # Except this files and folders
 !.gitignore
 !nginx.conf
-!/mlflow_image/
+!/mlflow_image/*
