@@ -1,0 +1,6 @@
+# Ignore everything in this directory
+*
+# Except this files and folders
+!.gitignore
+!nginx.conf
+!/mlflow_image/
