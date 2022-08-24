@@ -14,6 +14,7 @@ opencv-python = "^4.6.0"
 dvc = {extras = ["s3"], version = "^2.15.0"}
 mlflow = "^1.27.0"
 python-dotenv = "^0.20.0"
+streamlit = "^1.12.0"
 
 [tool.poetry.dev-dependencies]
 notebook = "^6.4.12"
