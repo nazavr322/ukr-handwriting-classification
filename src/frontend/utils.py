@@ -1,6 +1,8 @@
 from collections import namedtuple
 from math import ceil
 
+import cv2 as cv
+
 
 Point = namedtuple('Point', ('x', 'y'))
 
@@ -34,3 +36,13 @@ def merge_bounding_boxes(
     highest_p = min(points, key=lambda p: p.y)
     lowest_p = max(points, key=lambda p: p.y) 
     return Point(leftmost_p.x, highest_p.y), Point(rightmost_p.x, lowest_p.y)
+
+
+def encode_image(img) -> bytes:
+    """
+    Encodes .png image into streaming data and returns its' bytes
+    representation.
+    """
+    bgr_img = cv.cvtColor(img, cv.COLOR_RGB2BGR)
+    encoded_img = cv.imencode('.png', bgr_img)[1]
+    return encoded_img.tobytes()
