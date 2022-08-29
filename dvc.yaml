@@ -1,14 +1,15 @@
 stages:
   
   prepare_glyphs:
-    cmd: python src/data/prepare_glyphs.py data/raw/glyphs/ data/interim/glyphs/
+    cmd: python -m src.data.prepare_glyphs data/raw/glyphs.csv data/raw/glyphs/ data/interim/glyphs/
     deps:
+      - data/raw/glyphs.csv
       - data/raw/glyphs/
     outs:
       - data/interim/glyphs/
 
   prepare_mnist:
-    cmd: python src/data/prepare_mnist.py data/raw 50 data/interim/digits.csv data/interim/digits/
+    cmd: python src/data/prepare_mnist.py data/raw 25 data/interim/digits.csv data/interim/digits/
     deps:
       - data/raw/MNIST/raw/
     outs:
