@@ -5,8 +5,14 @@ from argparse import ArgumentParser
 
 def create_parser() -> ArgumentParser:
     parser = ArgumentParser()
-    parser.add_argument('glyphs_path', help='path to folder where processed glyphs pictures are stored')
-    parser.add_argument('mnist_path', help='path to folder where processed mnist pictures are stored')
+    parser.add_argument(
+        'glyphs_path',
+        help='path to folder where processed glyphs pictures are stored'
+    )
+    parser.add_argument(
+        'mnist_path',
+        help='path to folder where processed mnist pictures are stored'
+    )
     return parser
 
 
@@ -17,7 +23,7 @@ def merge_pictures(glyphs_path: str, mnist_path: str) -> None:
     """
     target_dir = 'data/processed/glyphs/'
     if not os.path.isdir(target_dir):
-        os.mkdir(target_dir)
+        os.makedirs(target_dir)
 
     for directory in (glyphs_path, mnist_path):
         for root, _, files in os.walk(directory):
