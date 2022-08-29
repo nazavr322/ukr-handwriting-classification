@@ -7,3 +7,9 @@ __pycache__/
 # local mlflow runs
 mlruns/
 mlflow.db
+
+# PyCharm stuff
+.idea
+
+# Environment
+.env
