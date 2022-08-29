@@ -24,9 +24,8 @@ def prepare_mnist(
     """
     Prepares `num_samples` samples of each class to be joined with original
     data.
-    
-    Each sample is saved as an image, and corresponding information is added\
- to the `out_name`.csv file
+    Each sample is saved as an image, and corresponding information is added
+    to the `out_name`.csv file
     """
     # create glyphs directory if it doesn't exist
     if not os.path.isdir(out_img_dir):
