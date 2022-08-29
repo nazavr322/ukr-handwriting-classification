@@ -36,6 +36,11 @@ def create_parser() -> ArgumentParser:
     parser.add_argument(
         'params_path', help='.json file with hyperparameters values'
     )
+    parser.add_argument(
+        '--experiment-name',
+        default='Multi-Output CNN',
+        help='MLFlow expertiment name'
+    )
     return parser
 
 
@@ -81,7 +86,7 @@ if __name__ == '__main__':
     model.to(DEVICE)
 
     # set mlflow experiment
-    mlflow.set_experiment('Multi-output CNN')
+    mlflow.set_experiment(args.experiment_name)
 
     # start training run
     with mlflow.start_run(run_name='Training') as run:
