@@ -31,7 +31,7 @@ def prepare_mnist(
     if not os.path.isdir(out_img_dir):
         os.mkdir(out_img_dir)
     
-    data = MNIST(raw_dir, download=True, train=True, transform=T.Grayscale(3))
+    data = MNIST(raw_dir, download=True, train=False, transform=T.Grayscale(3))
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
 
