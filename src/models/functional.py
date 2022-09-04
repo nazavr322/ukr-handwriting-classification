@@ -1,8 +1,17 @@
+import os
+
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import ConfusionMatrixDisplay
+
+
+def print_title(msg: str, decorator: str = '=') -> None:
+    """Prints a title message"""
+    width = os.get_terminal_size()[0]  # get terminal width
+    template = decorator * width + '\n{}\n' + decorator * width + '\n'
+    print(template.format(msg.center(width)))
 
 
 def predict(model, x: torch.Tensor) -> torch.Tensor:
