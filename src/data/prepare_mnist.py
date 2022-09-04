@@ -30,7 +30,7 @@ def prepare_mnist(
     # create glyphs directory if it doesn't exist
     if not os.path.isdir(out_img_dir):
         os.mkdir(out_img_dir)
-    
+
     data = MNIST(raw_dir, download=True, train=False, transform=T.Grayscale(3))
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
