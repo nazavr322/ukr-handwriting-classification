@@ -9,7 +9,7 @@ stages:
       - data/interim/glyphs/
 
   prepare_mnist:
-    cmd: python src/data/prepare_mnist.py data/raw 25 data/interim/digits.csv data/interim/digits/
+    cmd: python src/data/prepare_mnist.py data/raw 50 data/interim/digits.csv data/interim/digits/
     deps:
       - data/raw/MNIST/raw/
     outs:
@@ -48,9 +48,9 @@ stages:
       - data/processed/test_data.csv
   
   train_and_evaluate:
-    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/mnist_model.pt models/best_params.json
+    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/best_params.json --mnist_weights models/mnist_model.pt
     deps:
       - data/processed/train_data.csv
       - data/processed/test_data.csv
-      - models/mnist_model.pt
       - models/best_params.json
+      - data/processed/glyphs/
