@@ -1,10 +1,24 @@
 {
-    "num_epochs": 30,
-    "batch_size": 64,
-    "optimizer": "SGD",
-    "learning_rate": 0.012947555925250388,
-    "weight_decay": 0.0012874435583927798,
-    "scheduler": "ReduceLROnPlateau",
-    "factor": 0.14223426672659512,
-    "patience": 2
+    "head_params":
+    {
+        "num_epochs": 20,
+        "batch_size": 64,
+        "optimizer": "Adam",
+        "learning_rate": 0.04535325828472009,
+        "weight_decay": 0.0021492237208506153,
+        "scheduler": "ReduceLROnPlateau",
+        "factor": 0.1895288603647687,
+        "patience": 3
+    },
+    "fine-tune":
+    {
+        "num_epochs": 15,
+        "batch_size": 64,
+        "optimizer": "Adam",
+        "learning_rate": 0.0023955033226241208,
+        "weight_decay": 0.001516250075936066,
+        "scheduler": "ReduceLROnPlateau",
+        "factor": 0.3278769074801458,
+        "patience": 2
+    }
 }

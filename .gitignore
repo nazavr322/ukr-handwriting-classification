@@ -13,3 +13,8 @@ mlflow.db
 
 # Environment
 .env
+
+# temp stuff
+notebooks/Untitled.ipynb
+models/model_heads.pth
+models/model_v2.pth

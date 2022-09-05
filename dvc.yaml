@@ -1,8 +1,9 @@
 stages:
   
   prepare_glyphs:
-    cmd: python src/data/prepare_glyphs.py data/raw/glyphs/ data/interim/glyphs/
+    cmd: python -m src.data.prepare_glyphs data/raw/glyphs.csv data/raw/glyphs/ data/interim/glyphs/
     deps:
+      - data/raw/glyphs.csv
       - data/raw/glyphs/
     outs:
       - data/interim/glyphs/
@@ -47,9 +48,10 @@ stages:
       - data/processed/test_data.csv
   
   train_and_evaluate:
-    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/mnist_model.pt models/best_params.json
+    cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv models/best_params.json --mnist_weights models/mnist_model.pt
     deps:
       - data/processed/train_data.csv
       - data/processed/test_data.csv
-      - models/mnist_model.pt
       - models/best_params.json
+      - data/processed/glyphs/
+      - models/mnist_model.pt

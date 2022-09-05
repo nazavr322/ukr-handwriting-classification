@@ -19,11 +19,11 @@ stages:
       nfiles: 4
     outs:
     - path: data/interim/digits.csv
-      md5: 664892ae0586507ae6c75eddf776a96b
-      size: 11927
+      md5: de7af44095a0d11021c10ed5648085b9
+      size: 11427
     - path: data/interim/digits/
-      md5: c7995e76c4b4fb69f9c3a623a7164c5a.dir
-      size: 235978
+      md5: d8510d0e94ecf21f427c17d82dbb2563.dir
+      size: 232623
       nfiles: 500
   make_dataset:
     cmd: python -m src.data.make_dataset data/interim/data_cleaned.csv data/interim/digits.csv
@@ -33,66 +33,73 @@ stages:
       md5: d38d09b5b430723610317fad2c26e161
       size: 22855
     - path: data/interim/digits.csv
-      md5: 664892ae0586507ae6c75eddf776a96b
-      size: 11927
+      md5: de7af44095a0d11021c10ed5648085b9
+      size: 11427
     outs:
     - path: data/processed/final.csv
-      md5: cc992156dc00c3e5e08d62b7cab8cb32
+      md5: 2f033bb1cbd0d700c71647d9c3586587
       size: 37007
   train_test_split:
     cmd: python src/data/split_train_test.py data/processed/final.csv
     deps:
     - path: data/processed/final.csv
-      md5: cc992156dc00c3e5e08d62b7cab8cb32
+      md5: 2f033bb1cbd0d700c71647d9c3586587
       size: 37007
     outs:
     - path: data/processed/test_data.csv
-      md5: d298ed5f35958344cb2db903757fee52
+      md5: 4a90611810519a1727d453b4c79cabf7
       size: 7014
     - path: data/processed/train_data.csv
-      md5: 000b7fd561981101b12365cb85c5f7ee
+      md5: 2d4dccf04ccc0ddf586e38dbece3f7d6
       size: 30030
   prepare_glyphs:
-    cmd: python src/data/prepare_glyphs.py data/raw/glyphs/ data/interim/glyphs/
+    cmd: python -m src.data.prepare_glyphs data/raw/glyphs.csv data/raw/glyphs/ data/interim/glyphs/
     deps:
+    - path: data/raw/glyphs.csv
+      md5: e25acb0764504378eb5d5ffaf1eff861
+      size: 68252
     - path: data/raw/glyphs/
       md5: 3b1e52247eb8122b5bcb26fa2bd25bcb.dir
       size: 1722818
       nfiles: 1095
     outs:
     - path: data/interim/glyphs/
-      md5: 88e25d3eff915d10ba29201efd8c5c26.dir
-      size: 291050
-      nfiles: 1095
+      md5: c8ebdffd5411304bb5333bae2b359533.dir
+      size: 487833
+      nfiles: 1081
   merge_pictures:
     cmd: python src/data/merge_pictures.py data/interim/glyphs/ data/interim/digits/
     deps:
     - path: data/interim/digits/
-      md5: c7995e76c4b4fb69f9c3a623a7164c5a.dir
-      size: 235978
+      md5: d8510d0e94ecf21f427c17d82dbb2563.dir
+      size: 232623
       nfiles: 500
     - path: data/interim/glyphs/
-      md5: 88e25d3eff915d10ba29201efd8c5c26.dir
-      size: 291050
-      nfiles: 1095
+      md5: c8ebdffd5411304bb5333bae2b359533.dir
+      size: 487833
+      nfiles: 1081
     outs:
     - path: data/processed/glyphs/
-      md5: 3efeb69678d8cca5f95dc5d61871f782.dir
-      size: 527028
-      nfiles: 1595
+      md5: bea02b3070925104f9257b6b242f9af4.dir
+      size: 720456
+      nfiles: 1581
   train_and_evaluate:
     cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv
-      models/mnist_model.pt models/best_params.json
+      models/best_params.json --mnist_weights models/mnist_model.pt
     deps:
+    - path: data/processed/glyphs/
+      md5: bea02b3070925104f9257b6b242f9af4.dir
+      size: 720456
+      nfiles: 1581
     - path: data/processed/test_data.csv
-      md5: d298ed5f35958344cb2db903757fee52
+      md5: 4a90611810519a1727d453b4c79cabf7
       size: 7014
     - path: data/processed/train_data.csv
-      md5: 000b7fd561981101b12365cb85c5f7ee
+      md5: 2d4dccf04ccc0ddf586e38dbece3f7d6
       size: 30030
     - path: models/best_params.json
-      md5: 46cd7d7adbeddc8cb8ab78a5c5836daa
-      size: 249
+      md5: 49e9399cc8b1073b0781215d9b4b2e48
+      size: 618
     - path: models/mnist_model.pt
       md5: 888469a8360c8d350bfb7943db4f027d
       size: 3312672

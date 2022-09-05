@@ -1,7 +1,7 @@
 import os
 import json
-import warnings
 from argparse import ArgumentParser
+from itertools import chain
 
 import mlflow
 import numpy as np
@@ -14,13 +14,7 @@ from dotenv import load_dotenv
 
 from src import ROOT_DIR
 from .models import HandwritingClassifier
-from .functional import (
-    initialize_loaders,
-    train_model,
-    evaluate_model,
-    get_confusion_matrix,
-    predict,
-)
+from .functional import *
 from ..data.datasets import HandwritingDataset
 
 
@@ -30,30 +24,58 @@ def create_parser() -> ArgumentParser:
     parser.add_argument('train_path', help='.csv file with the training data')
     parser.add_argument('test_path', help='.csv file with the test data')
     parser.add_argument(
-        'weights_path',
+        'params_path', help='.json file with hyperparameters values'
+    )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        '--mnist_weights',
         help='.pt file with the weights of a model pretrained on MNIST',
     )
+    group.add_argument(
+        '--head_weights',
+        help='.pth file with the weights of a MNIST model with 2 heads',
+    )
     parser.add_argument(
-        'params_path', help='.json file with hyperparameters values'
+        '--experiment-name',
+        default='Multi-Output CNN',
+        help='MLFlow expertiment name',
     )
     return parser
 
 
 if __name__ == '__main__':
-    parser = create_parser()
-    args = parser.parse_args()  # parse cmd arguments
-    
-    load_dotenv()  # load environmental variables
+    # initialize constants
 
     # initialize device
     DEVICE = device('cuda') if cuda.is_available() else device('cpu')
-    # initalize precomputed mean and standart deviation
+
+    # initialize precomputed mean and standard deviation
     MEAN = HandwritingClassifier._mean
     STD = HandwritingClassifier._std
 
-    TERM_WIDTH = os.get_terminal_size()[0]  # get terminal width
-    # prepare template for displayed messages
-    title_template = '=' * TERM_WIDTH + '\n{}\n' + '=' * TERM_WIDTH + '\n'
+    # initialize train/val metric names
+    METRICS = (
+        'Training loss',
+        'Validation loss',
+        'Validation label accuracy',
+        'Validation is_upp accuracy',
+    )
+
+    # message to print when displaying accuracies
+    ACC_MSG = 'Accuracy of a {} classification on a test dataset = {:.2%}'
+
+    # message to show when model is not logged
+    MODEL_NOT_LOGGED_MSG = (
+        'Your model is not logged because accuracy of label '
+        'classification ({}) is lower than accuracy '
+        'threshold ({})'
+    )
+
+    # parse cmd arguments
+    parser = create_parser()
+    args = parser.parse_args()
+
+    load_dotenv()  # load environmental variables
 
     # initialize train dataset
     train_tfs = T.Compose(
@@ -68,96 +90,167 @@ if __name__ == '__main__':
         os.path.join(ROOT_DIR, args.train_path), train_tfs
     )
 
+    # initialize test dataset
+    test_dset = HandwritingDataset(
+        os.path.join(ROOT_DIR, args.test_path),
+        T.Compose([T.ToTensor(), T.Normalize(mean=MEAN, std=STD)]),
+    )
+
     # read hyperparameters from .json file
     with open(os.path.join(ROOT_DIR, args.params_path), 'r') as f:
-        params = json.load(f)
-
-    # initialize model
-    model = HandwritingClassifier()
-    model.load_state_dict(
-        load(os.path.join(ROOT_DIR, args.weights_path)),
-        strict=False,
-    )
-    model.to(DEVICE)
+        pretrain_params, finetune_params = json.load(f).values()
 
     # set mlflow experiment
-    mlflow.set_experiment('Multi-output CNN')
+    mlflow.set_experiment(args.experiment_name)
+
+    if args.head_weights is None:
+        # initialize model
+        model = HandwritingClassifier()
+        model.load_state_dict(
+            load(os.path.join(ROOT_DIR, args.mnist_weights)), strict=False
+        )
+
+        # freeze pretrained model
+        freeze_model(model)
+        model.to(DEVICE)
+
+        # start pre-training run
+        with mlflow.start_run(run_name='Pre-training') as run:
+            # log hyperparameters
+            mlflow.log_params(pretrain_params)
+
+            # initialize data loaders
+            BATCH_SIZE = pretrain_params['batch_size']
+            train_loader, val_loader = initialize_loaders(
+                train_dset, BATCH_SIZE
+            )
+
+            # initialize other hyperparameters
+            NUM_EPOCHS = pretrain_params['num_epochs']
+            LR = pretrain_params['learning_rate']
+            REG = pretrain_params['weight_decay']
+            GAMMA = pretrain_params['factor']
+            PAT = pretrain_params['patience']
+
+            # initialize loss functions
+            criterion1 = CrossEntropyLoss().to(DEVICE)
+            criterion2 = BCEWithLogitsLoss().to(DEVICE)
+
+            # initialize optimizer and lr-scheduler
+            heads = chain(
+                model.token_classifier.parameters(),
+                model.is_upp_classifier.parameters(),
+            )
+            optimizer = optim.Adam(heads, lr=LR, weight_decay=REG)
+            scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer, factor=GAMMA, patience=PAT
+            )
+
+            # start pre-training
+            print_title('Pre-Training started', decorator='+')
+            train_results = train_model(
+                model,
+                train_loader,
+                val_loader,
+                optimizer,
+                (criterion1, criterion2),
+                NUM_EPOCHS,
+                DEVICE,
+                scheduler,
+            )
+
+            # log training and validation metrics
+            for metric, history in zip(METRICS, train_results):
+                for epoch, value in enumerate(history):
+                    mlflow.log_metric(metric, value, epoch)
+
+            # initialize test dataloader
+            test_loader = DataLoader(test_dset)
+
+            # compute accuracies
+            lbl_acc, is_upp_acc, preds = evaluate_model(
+                model, test_loader, DEVICE
+            )
+            print(ACC_MSG.format('label', lbl_acc))
+            print(ACC_MSG.format('case', is_upp_acc) + '\n')
+
+            # log evaluation metrics
+            mlflow.log_metric('Label accuracy', lbl_acc)
+            mlflow.log_metric('Is upp accuracy', is_upp_acc)
+
+            # set accuracy threshold for label classification
+            ACC_THRESH = 0.81
+
+            # log model
+            if lbl_acc >= ACC_THRESH:
+                log_model(model, 'pretrained_heads')
+            else:
+                print(MODEL_NOT_LOGGED_MSG.format(lbl_acc, ACC_THRESH))
+
+            # unfreeze model for further fine-tuning
+            unfreeze_model(model)
+    else:
+        # load and unfreeze model
+        model = load(os.path.join(ROOT_DIR, args.head_weights))
+        unfreeze_model(model)
 
     # start training run
     with mlflow.start_run(run_name='Training') as run:
         # log hyperparameters
-        mlflow.log_params(params)
+        mlflow.log_params(finetune_params)
 
         # initialize data loaders
-        BATCH_SIZE = params['batch_size']
+        BATCH_SIZE = finetune_params['batch_size']
         train_loader, val_loader = initialize_loaders(train_dset, BATCH_SIZE)
 
         # initialize other hyperparameters
-        NUM_EPOCHS = params['num_epochs']
-        LR = params['learning_rate']
-        REG = params['weight_decay']
-        GAMMA = params['factor']
-        PAT = params['patience']
+        NUM_EPOCHS = finetune_params['num_epochs']
+        LR = finetune_params['learning_rate']
+        REG = finetune_params['weight_decay']
+        GAMMA = finetune_params['factor']
+        PAT = finetune_params['patience']
 
         # initialize loss functions
         criterion1 = CrossEntropyLoss().to(DEVICE)
         criterion2 = BCEWithLogitsLoss().to(DEVICE)
-        losses = (criterion1, criterion2)
 
         # initialize optimizer and lr-scheduler
-        optimizer = optim.SGD(
-            model.parameters(), lr=LR, momentum=0.9, weight_decay=REG
-        )
+        optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=REG)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, factor=GAMMA, patience=PAT
         )
 
         # start training
-        print(title_template.format('Training started'.center(TERM_WIDTH)))
+        print_title('Training started')
         train_results = train_model(
             model,
             train_loader,
             val_loader,
             optimizer,
-            losses,
+            (criterion1, criterion2),
             NUM_EPOCHS,
             DEVICE,
             scheduler,
         )
 
         # log training and validation metrics
-        metrics = (
-            'Training loss',
-            'Validation loss',
-            'Validation label accuracy',
-            'Validation is_upp accuracy',
-        )
-        for metric, history in zip(metrics, train_results):
+        for metric, history in zip(METRICS, train_results):
             for epoch, value in enumerate(history):
                 mlflow.log_metric(metric, value, epoch)
 
-    # initialize test dataset
-    test_tfs = T.Compose([T.ToTensor(), T.Normalize(mean=MEAN, std=STD)])
-    test_dset = HandwritingDataset(
-        os.path.join(ROOT_DIR, args.test_path), test_tfs
-    )
-    # initialize dataloader
+    # initialize test dataloader
     test_loader = DataLoader(test_dset)
 
     # set accuracy threshold for label classification
-    ACC_THRESH = 0.91
+    ACC_THRESH = 0.93
 
     # start evaluation run
     with mlflow.start_run(run_name='Evaluation') as run:
-        print(
-            '\n'
-            + title_template.format('Evaluation started'.center(TERM_WIDTH))
-        )
+        print_title('Evaluation started', '*')
         # compute accuracies
         lbl_acc, is_upp_acc, preds = evaluate_model(model, test_loader, DEVICE)
-        acc_msg = 'Accuracy of a {} classification on a test dataset = {:.2%}'
-        print(acc_msg.format('label', lbl_acc))
-        print(acc_msg.format('case', is_upp_acc) + '\n')
+        print(ACC_MSG.format('label', lbl_acc))
+        print(ACC_MSG.format('case', is_upp_acc) + '\n')
 
         # log evaluation metrics
         mlflow.log_metric('Label accuracy', lbl_acc)
@@ -193,11 +286,12 @@ if __name__ == '__main__':
         print('Confusion matrix successfully logged!')
 
         if lbl_acc >= ACC_THRESH:
-            # get sample of model input and unprocessed output
+            # get the sample of model input and unprocessed output
             inp_tensor = train_dset[0][0].unsqueeze(0).to(DEVICE)
             outs = [
                 p.cpu().detach().numpy() for p in predict(model, inp_tensor)
             ]
+
             # create model signature
             np_inp_tensor = inp_tensor.cpu().detach().numpy()
             signature = mlflow.models.infer_signature(
@@ -205,19 +299,7 @@ if __name__ == '__main__':
                 {'label_probs': outs[0], 'is_upp_prob': outs[1]},
             )
 
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                # log model
-                mlflow.pytorch.log_model(
-                    model,
-                    'multi_output_cnn',
-                    signature=signature,
-                    input_example=np_inp_tensor,
-                )
-            print('Your model successfully logged')
+            # log model
+            log_model(model, 'multi_output_cnn', signature, np_inp_tensor)
         else:
-            print(
-                'Your model is not logged because accuracy of label '
-                f'classification ({lbl_acc}) is lower than accuracy '
-                f'threshold ({ACC_THRESH})'
-            )
+            print(MODEL_NOT_LOGGED_MSG.format(lbl_acc, ACC_THRESH))

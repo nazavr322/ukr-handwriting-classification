@@ -24,15 +24,14 @@ def prepare_mnist(
     """
     Prepares `num_samples` samples of each class to be joined with original
     data.
-    
-    Each sample is saved as an image, and corresponding information is added\
- to the `out_name`.csv file
+    Each sample is saved as an image, and corresponding information is added
+    to the `out_name`.csv file
     """
     # create glyphs directory if it doesn't exist
     if not os.path.isdir(out_img_dir):
         os.mkdir(out_img_dir)
-    
-    data = MNIST(raw_dir, download=True, train=True, transform=T.Grayscale(3))
+
+    data = MNIST(raw_dir, download=True, train=False, transform=T.Grayscale(3))
     targets = np.array(data.targets)
     indices = (np.where(targets == cls)[0][:num_samples] for cls in range(10)) 
 
@@ -43,7 +42,7 @@ def prepare_mnist(
                 img, cls = data[cls_idx]
                 filename = f'{cls}-{i}.png'
                 img.save(os.path.join(out_img_dir, filename))
-                f.write(f'\n{cls},{False},glyphs/{filename}')
+                f.write(f'\n{cls},{True},glyphs/{filename}')
 
 
 if __name__ == '__main__':
