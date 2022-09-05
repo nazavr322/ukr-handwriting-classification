@@ -42,7 +42,7 @@ def prepare_mnist(
                 img, cls = data[cls_idx]
                 filename = f'{cls}-{i}.png'
                 img.save(os.path.join(out_img_dir, filename))
-                f.write(f'\n{cls},{False},glyphs/{filename}')
+                f.write(f'\n{cls},{True},glyphs/{filename}')
 
 
 if __name__ == '__main__':
