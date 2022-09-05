@@ -142,4 +142,5 @@ Also, I've prepared confusion matrices to visualize model predictions:
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metric values.
 We have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such ukrainian letters as `г` and `ґ`, `е`, `є` and `с`.    
 At the same time, we did pretty good on lowercase/uppercase classification too. On the corresponding confusion matrix you can see than we have only `3` false positives and `20` false negatives. And this is without knowing uppercase variants for 17 letters at all!    
+   
 To sum up, this results look quite good, taking to account all constraints I have. Metrics values can be improvement in a future probably by adding more data.
