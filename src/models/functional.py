@@ -1,16 +1,20 @@
 import os
+import warnings
+from typing import Optional
 
-import numpy as np
 import torch
+import numpy as np
+import mlflow.pytorch as pytorch
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import ConfusionMatrixDisplay
+from mlflow.models.signature import ModelSignature
 
 
 def print_title(msg: str, decorator: str = '=') -> None:
     """Prints a title message"""
     width = os.get_terminal_size()[0]  # get terminal width
-    template = decorator * width + '\n{}\n' + decorator * width + '\n'
+    template = '\n' + decorator * width + '\n{}\n' + decorator * width + '\n'
     print(template.format(msg.center(width)))
 
 
@@ -37,13 +41,13 @@ def initialize_loaders(
     return train_loader, val_loader
 
 
-def compute_accuracy(prediction, ground_truth) -> float:
+def _compute_accuracy(prediction, ground_truth) -> float:
     """Computes accuracy between prediction and ground_truth"""
     correct_count = torch.sum(prediction == ground_truth).item()
     return correct_count / len(ground_truth)
 
 
-def validate_model(model, losses, loader, device) -> tuple[float, ...]:
+def _validate_model(model, losses, loader, device) -> tuple[float, ...]:
     """Validates model based on 2 metrics"""
     model.eval()
     loss_acum = 0
@@ -63,9 +67,9 @@ def validate_model(model, losses, loader, device) -> tuple[float, ...]:
 
         loss_acum += loss_value.item()
         labels = torch.argmax(prediction[0], 1)
-        lbl_acc += compute_accuracy(labels, y_gpu[0])
+        lbl_acc += _compute_accuracy(labels, y_gpu[0])
         is_upp = 0 if prediction[1].item() < 0.5 else 1
-        is_upp_acc += compute_accuracy(is_upp, y_gpu[1])
+        is_upp_acc += _compute_accuracy(is_upp, y_gpu[1])
     return loss_acum / i, lbl_acc / i, is_upp_acc / i
 
 
@@ -106,7 +110,7 @@ def train_model(
 
             loss_acum += loss_value.item()
         epoch_loss = loss_acum / i
-        val_loss, lbl_acc, is_upp_acc = validate_model(
+        val_loss, lbl_acc, is_upp_acc = _validate_model(
             model, losses, val_loader, device
         )
 
@@ -148,8 +152,8 @@ def evaluate_model(model, loader, device) -> tuple[float, float, np.ndarray]:
         is_upp = 0 if prediction[1] < 0.5 else 1
         preds.append((label.item(), is_upp))
 
-        lbl_acc += compute_accuracy(label, y_gpu[0])
-        is_upp_acc += compute_accuracy(is_upp, y_gpu[1])
+        lbl_acc += _compute_accuracy(label, y_gpu[0])
+        is_upp_acc += _compute_accuracy(is_upp, y_gpu[1])
     return lbl_acc / i, is_upp_acc / i, np.array(preds)
 
 
@@ -157,7 +161,7 @@ def get_confusion_matrix(
     gt, preds, disp_labels, title: str, **kwargs
 ) -> ConfusionMatrixDisplay:
     """
-    Returns confusion matrix between `gt` and `preds` as a 
+    Returns confusion matrix between `gt` and `preds` as a
     `ConfusionMatrixDisplay` object.
     """
     cm = ConfusionMatrixDisplay.from_predictions(
@@ -171,3 +175,32 @@ def get_confusion_matrix(
 
     cm.figure_.set_dpi(kwargs.get('dpi', 100))
     return cm
+
+
+def freeze_model(model: torch.nn.Module) -> None:
+    """Freezes encoder part of the Model"""
+    for fname, param in model.named_parameters():
+        name = fname.split('.')[0]
+        if name == 'token_classifier' or name == 'is_upp_classifier':
+            continue
+        param.requires_grad = False
+
+
+def unfreeze_model(model: torch.nn.Module) -> None:
+    """Unfreezes entire model"""
+    for param in model.parameters():
+        param.requires_grad = True
+
+
+def log_model(
+    model: torch.nn.Module,
+    name: str,
+    sign: Optional[ModelSignature] = None,
+    inp_ex: Optional[np.ndarray] = None,
+) -> None:
+    """Logs pytorch model"""
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        # log model
+        pytorch.log_model(model, name, signature=sign, input_example=inp_ex)
+        print('Your model successfully logged')
