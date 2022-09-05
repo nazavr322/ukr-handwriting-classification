@@ -54,3 +54,4 @@ stages:
       - data/processed/test_data.csv
       - models/best_params.json
       - data/processed/glyphs/
+      - models/mnist_model.pt
