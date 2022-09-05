@@ -35,7 +35,7 @@ def prepare_glyphs(
         image = cv.imread(os.path.join(raw_img_dir, filename))
         image = image[row.left:row.right, row.top:row.bottom]
         image = cv.copyMakeBorder(
-            image, 10, 10, 10, 10, cv.BORDER_CONSTANT, value=[255, 255, 255]
+            image, 15, 15, 15, 15, cv.BORDER_CONSTANT, value=[255, 255, 255]
         )
         image = cv.resize(image, (28, 28))
         image = cv.bitwise_not(image)
