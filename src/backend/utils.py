@@ -6,6 +6,9 @@ from torch import Tensor, from_numpy, device
 
 from ..models.models import HandwritingClassifier
 
+    
+MEAN, STD = HandwritingClassifier._mean[0], HandwritingClassifier._std[0]
+
 
 class InferenceModel:
     """
@@ -17,11 +20,10 @@ class InferenceModel:
         kwargs = {'map_location': device('cpu')}
         self.model = mlflow.pytorch.load_model(model_uri, kwargs=kwargs)
     
-    def predict(self, images: Tensor) -> tuple[np.ndarray, np.ndarray]:
+    def predict(self, images: Tensor) -> tuple[Tensor, Tensor]:
         """Returns raw model predictions"""
         self.model.eval()
-        lbl_logits, is_upp_logits = self.model(images)
-        return lbl_logits.numpy(), is_upp_logits.numpy()
+        return self.model(images)
 
 
 def read_img(img_file: UploadFile) -> Tensor:
@@ -37,7 +39,6 @@ def read_img(img_file: UploadFile) -> Tensor:
     image = cv.bitwise_not(image)  # invert
     image = np.float32(image / 255)  # clip to [0, 1] range
     # normalize
-    mean, std = HandwritingClassifier._mean[0], HandwritingClassifier._std[0]
-    image = (image - mean) / std
+    image = (image - MEAN) / STD
     return from_numpy(image.transpose(2, 0, 1)[np.newaxis]) 
 
