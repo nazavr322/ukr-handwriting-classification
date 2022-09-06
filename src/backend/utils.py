@@ -6,7 +6,7 @@ from torch import Tensor, from_numpy, device
 
 from ..models.models import HandwritingClassifier
 
-    
+
 MEAN, STD = HandwritingClassifier._mean[0], HandwritingClassifier._std[0]
 
 
@@ -15,11 +15,12 @@ class InferenceModel:
     Wrapper around PyTorch model to load it from MLFlow model registry and
     make predictions conviniently.
     """
+
     def __init__(self):
         model_uri = 'models:/Multi-Output CNN/Production'
         kwargs = {'map_location': device('cpu')}
         self.model = mlflow.pytorch.load_model(model_uri, **kwargs)
-    
+
     def predict(self, images: Tensor) -> tuple[Tensor, Tensor]:
         """Returns raw model predictions"""
         self.model.eval()
@@ -40,5 +41,4 @@ def read_img(img_file: UploadFile) -> Tensor:
     image = np.float32(image / 255)  # clip to [0, 1] range
     # normalize
     image = (image - MEAN) / STD
-    return from_numpy(image.transpose(2, 0, 1)[np.newaxis]) 
-
+    return from_numpy(image.transpose(2, 0, 1)[np.newaxis])
