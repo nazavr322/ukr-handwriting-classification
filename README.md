@@ -149,11 +149,11 @@ At the same time, we did pretty good on lowercase/uppercase classification too. 
    
 To sum up, this results look quite good, taking to account all constraints I have. Metrics values can be improvement in a future probably by adding more data.
 ## MLFlow and FastAPI
-In this project I also use MLFlow for experiment tracking and registering models for production environment. My MlFlow workwlow is buit according to the following scenario:   
+In this project I also use MLFlow for experiment tracking and registering models for production environment. My MlFlow workflow is built according to the following scenario:   
 ![](https://mlflow.org/docs/latest/_images/scenario_4.png)
 In this architecture all storages and MLFlow tracking server itself are located on a remote hosts. Our code only acts as a client that makes requests to the tracking server, which logs metadata about runs into a database and stores artifacts (plots and model weights) in a remote S3 storage. I am using `PostgreSQL` as a database and `Minio` as a S3 storage.   
 I also wrote a simple API to work with a model using `FastAPI`. It loads a model version that is currently in `Production` stage in the MLFlow model registry.     
-I am running all this microservices using `docker-compose`, so you can reproduce a fully functional service with only a few commands (see [Getting Started](#getting-started) section).    
+I am running all these microservices using `docker-compose`, so you can reproduce a fully functional service with only a few commands (see [Getting Started](#getting-started) section).    
 Take a look at the scheme that depicts how my `docker-compose` is organized:
 ```mermaid
 flowchart TB
@@ -180,7 +180,7 @@ flowchart TB
 ```
 It may look kind of confusing, let me break it down for you. We go from top to bottom:   
 - You can see that `model_api` microservice is mapped to the port `8000` on host machine to port `8000` in container (`'8000:8000'`). This is a docker container with our FastAPI server code.
-- It depends on `mlflow_server` microservice, that runs on port `5000`. This is a docker container that runs MLFLow Tracking Server inside of it. You can find `Dockerfile` to build this image at `Docker/mlflow_server_image/Dockerfile`.
+- It depends on `mlflow_server` microservice, that runs on port `5000`. This is a docker container that runs MLFLow Tracking Server inside. You can find `Dockerfile` to build this image at `Docker/mlflow_server_image/Dockerfile`.
 - Then we see a dependency on `PostgreSQL` database. It uses volume, to save data even if container is stopped. Path inside a hexagon indicates a volume location on the host machine, and label matches location inside a container.
 - Next, `mlflow_server` also depends on `minio_client` microservice. This is a small container to automatically create user and S3-bucket when first launching a `docker-compose`.
 - Obviously, to create users and buckets, `minio_client` must depend on `minio` microservice, that gives us access to a Minio API on port `9000` and graphic UI on port `9001`. You can see another volume here.
