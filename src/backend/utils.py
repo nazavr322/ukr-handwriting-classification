@@ -18,7 +18,7 @@ class InferenceModel:
     def __init__(self):
         model_uri = 'models:/Multi-Output CNN/Production'
         kwargs = {'map_location': device('cpu')}
-        self.model = mlflow.pytorch.load_model(model_uri, kwargs=kwargs)
+        self.model = mlflow.pytorch.load_model(model_uri, **kwargs)
     
     def predict(self, images: Tensor) -> tuple[Tensor, Tensor]:
         """Returns raw model predictions"""
