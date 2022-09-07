@@ -29,4 +29,7 @@ def root():
 def predict(img_file: UploadFile):
     image = read_img(img_file)
     lbl_logits, is_upp_logits = model.predict(image)
-    return lbl_logits.tolist()[0], is_upp_logits.item()
+    return {
+        'label_logits': lbl_logits.tolist()[0],
+        'is_uppercase_logits': is_upp_logits.item(),
+    }
