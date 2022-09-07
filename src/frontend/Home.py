@@ -1,15 +1,16 @@
-from typing import Optional
-from math import ceil
+import os
 
 import requests
 import cv2 as cv
 import numpy as np
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
+from dotenv import load_dotenv
 
 from utils import create_bounding_boxes, merge_bounding_boxes, encode_image
 
-
+load_dotenv()  # load environmental variables
+API_ENDPOINT = os.environ['API_ENDPOINT']
 HEIGHT = 170
 
 
@@ -53,11 +54,21 @@ right_col.image(
     add_border(img_with_bb[1:-1, 1:-1]), 'Here is your prediction!', HEIGHT
 )
 
-# cropped_img = canvas_img[p1[1]:p2[1], p1[0]:p2[0]]
-# padded_img = cv.copyMakeBorder(
-#     cropped_img, 20, 20, 20, 20, cv.BORDER_CONSTANT, value=[255, 255, 255]
-# )
-# encoded_img = encode_image(padded_img)
-# file = {'img_file': ('test_img.png', encoded_img)}
-# response = requests.post('http://127.0.0.1:8000/file', files=file)
-# st.write(response.json())
+cropped_img = canvas_img[p1.y:p2.y, p1.x:p2.x]
+padded_img = cv.copyMakeBorder(
+    cropped_img, 20, 20, 20, 20, cv.BORDER_CONSTANT, value=[255, 255, 255]
+)
+encoded_img = encode_image(padded_img)
+file = {'img_file': ('test_img.png', encoded_img)}
+
+labels = '0123456789абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'
+with st.spinner('Processing your image...'):
+    response = requests.post(API_ENDPOINT, files=file)
+    label_logits, is_upp_logits = response.json().values()
+    best, *top2 = np.argsort(-np.array(label_logits))[:3]
+    kind = 'a lowercase' if is_upp_logits <= 0.5 else 'an uppercase'
+    prediction_msg = (
+        f'The model thinks that you drew {kind} {labels[best]}.'
+        f'  \nIt might also be: {" ".join(labels[i] for i in top2)}'
+    )
+st.info(prediction_msg, icon="🤖")
