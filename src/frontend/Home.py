@@ -1,3 +1,4 @@
+from typing import Optional
 from math import ceil
 
 import requests
@@ -11,10 +12,9 @@ from utils import create_bounding_boxes, merge_bounding_boxes, encode_image
 
 HEIGHT = 170
 
-@st.cache
-def create_white_img():
-    white_img = np.zeros((HEIGHT, HEIGHT), np.uint8) + 255
-    return np.pad(white_img, 1, constant_values=210)
+
+def add_border(img: np.ndarray) -> np.ndarray:
+   return np.pad(img, ((1, 1), (1, 1), (0, 0)), constant_values=215) 
 
 
 st.title('Classification of ukrainian handwriting 📝')
@@ -37,23 +37,21 @@ except TypeError:
     st.stop()
 
 if len(canvas_img_metadata) == 0:
-    white_img = create_white_img()
-    right_col.image(white_img, 'Your prediction will be here', HEIGHT)
+    white_img = np.zeros((HEIGHT - 2, HEIGHT - 2, 3), dtype=np.uint8) + 255
+    right_col.image(
+        add_border(white_img), 'Your prediction will be here', HEIGHT
+    )
     st.warning('You need to draw something first!', icon='⚠️')
     st.stop()
 
 canvas_img = canvas_result.image_data[:, :, :3].copy()
-if len(canvas_img_metadata) == 1:
-    meta = canvas_img_metadata[0]
-    left, top = meta['left'], meta['top']
-    width, height = meta['width'], meta['height']
-    p1 = (int(left), int(top))
-    p2 = (ceil(left + width) + 9, ceil(top + height) + 9)
-else:
-    boxes = create_bounding_boxes(canvas_img_metadata, 9)    
-    p1, p2 = merge_bounding_boxes(boxes)
+boxes = create_bounding_boxes(canvas_img_metadata, 9)    
+p1, p2 = merge_bounding_boxes(boxes)
+
 img_with_bb = cv.rectangle(canvas_img.copy(), p1, p2, (255, 0, 0), 2)
-right_col.image(img_with_bb, 'Here is your prediction!', HEIGHT)
+right_col.image(
+    add_border(img_with_bb[1:-1, 1:-1]), 'Here is your prediction!', HEIGHT
+)
 
 # cropped_img = canvas_img[p1[1]:p2[1], p1[0]:p2[0]]
 # padded_img = cv.copyMakeBorder(
