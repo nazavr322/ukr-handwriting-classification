@@ -156,6 +156,7 @@ I also wrote a simple API to work with a model using `FastAPI`. It loads a model
 I am running all these microservices using `docker-compose`, so you can reproduce a fully functional service with only a few commands (see [Getting Started](#getting-started) section).    
 Take a look at the scheme that depicts how my `docker-compose` is organized:
 ```mermaid
+%%{init: {'theme': 'default'}}%%
 flowchart TB
   VDockerpostgres{{./Docker/postgres/}} x-. /var/lib/postgresql/data .-x postgres[(postgres)]
   VDockerminio{{./Docker/minio/}} x-. /buckets .-x minio
@@ -184,5 +185,6 @@ It may look kind of confusing, let me break it down for you. We go from top to b
 - Then we see a dependency on `PostgreSQL` database. It uses volume, to save data even if container is stopped. Path inside a hexagon indicates a volume location on the host machine, and label matches location inside a container.
 - Next, `mlflow_server` also depends on `minio_client` microservice. This is a small container to automatically create user and S3-bucket when first launching a `docker-compose`.
 - Obviously, to create users and buckets, `minio_client` must depend on `minio` microservice, that gives us access to a Minio API on port `9000` and graphic UI on port `9001`. You can see another volume here.
-- Finally, you may have noticed that we have `nginx` microservice that actually exposes ports `9000` and `9001` to a host machine. In this setup, `nginx` works as a load balancer and proxifies all requests to Minio API and Minio UI.    
+- Finally, you may have noticed that we have `nginx` microservice that actually exposes ports `9000` and `9001` to a host machine. In this setup, `nginx` works as a load balancer and proxifies all requests to Minio API and Minio UI.     
+
 Now you can deploy this `docker-compose` to some cloud and experiment with different models, while all the needed data will be tracked and store remotely. Or build some services using model API. You can change usernames, passwords, bucket names etc. defined in a `.env` file as you wish. 
