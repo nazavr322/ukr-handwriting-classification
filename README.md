@@ -14,12 +14,13 @@ All data versioning, managing and preprocessing is done using DVC. I performed h
 - [x] **Model training**
     - [x] Create baseline model and pretrain it on MNIST.
     - [x] Using transfer learning fine-tune pretrained model to recognize both digits and letters as well as uppercase/lowercase classification (Multi-Output CNN).
-- [ ] **Backend**
+- [x] **Backend**
     - [x] Add hyperparameter logging and model tracking using MLFlow.
-    - [ ] Create Docker Compose with Minio S3 for artifact storage, PostgreSQL for model registry, MLFlow server and backend code with FastAPI
-    - [ ] Deploy Docker container to some cloud VM.
+    - [x] Create Docker Compose with Minio S3 for artifact storage, PostgreSQL for model registry, MLFlow server and backend code with FastAPI
 - [ ] **Frontend**
-    - [ ] Create web interface (most likely with streamlit)  
+    - [ ] Create web interface with streamlit  
+- [ ] **Deploy**
+    - [ ] Deploy Docker container to some cloud VM.
     
 # About
 Below I will go over the various parts of the project, explaining some key points.
@@ -35,6 +36,8 @@ Below I will go over the various parts of the project, explaining some key point
 ├── Docker              <- Folder to store docker volumes, Dockerfiles and files needed to build images.
 │   ├── mlflow_image
 │   │   └── Dockerfile          <- Dockerfile to build image with mlflow server.
+│   ├── model_api_image
+│   │   └── Dockerfile          <- Dockerfile to build image with model API.
 │   └── nginx.conf              <- Nginx configuration file for minio.
 │
 ├── models              <- Trained and serialized models, hyperparameters.
@@ -49,7 +52,8 @@ Below I will go over the various parts of the project, explaining some key point
 │
 ├── src                 <- Source code for use in this project.
 │   ├── backend         <- All backend related code..
-│   │   └── main.py             <- Logic of a backend server.
+│   │   ├── main.py             <- Logic of a backend server.
+│   │   └── utils.py            <- File with utility functions.
 │   ├── data            <- Scripts related to data processing or generation.
 │   │   ├── clean_data.py       <- Script to drop unneeded columns.
 │   │   ├── datasets.py         <- File with definitions of datasets.
@@ -131,8 +135,8 @@ A few words about loss functions, after experimenting with different weighting s
 All the hyperparameters where fine-tuned with [`optuna`](https://github.com/optuna/optuna) framework, you can check out this code at `notebooks/optuna.ipynb`.
 ## Final Evaluation Results
 After training the model above for 30 epochs, I was able to achieve this results on test dataset of 300 samples:
-- `Label classification accuracy = 93.3%`
-- `Is uppercase classification accuracy = 92.3%`
+- `Label classification accuracy = 94.3%`
+- `Is uppercase classification accuracy = 92.6%`
 
 Also, I've prepared confusion matrices to visualize model predictions:
 ![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/lbl_cm.png)
@@ -140,7 +144,45 @@ Also, I've prepared confusion matrices to visualize model predictions:
     
     
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metric values.
-We have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such ukrainian letters as `г` and `ґ`, `е`, `є` and `с`.    
-At the same time, we did pretty good on lowercase/uppercase classification too. On the corresponding confusion matrix you can see than we have only `3` false positives and `20` false negatives. And this is without knowing uppercase variants for 17 letters at all!    
+We have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such ukrainian letters as, for example, `г` and `ґ`.
+At the same time, we did pretty good on lowercase/uppercase classification too. On the corresponding confusion matrix you can see than we have only `2` false positives and `21` false negatives. And this is without knowing uppercase variants for 17 letters at all!    
    
 To sum up, this results look quite good, taking to account all constraints I have. Metrics values can be improvement in a future probably by adding more data.
+## MLFlow and FastAPI
+In this project I also use MLFlow for experiment tracking and registering models for production environment. My MlFlow workflow is built according to the following scenario:   
+![](https://mlflow.org/docs/latest/_images/scenario_4.png)
+In this architecture all storages and MLFlow tracking server itself are located on a remote hosts. Our code only acts as a client that makes requests to the tracking server, which logs metadata about runs into a database and stores artifacts (plots and model weights) in a remote S3 storage. I am using `PostgreSQL` as a database and `Minio` as a S3 storage.   
+I also wrote a simple API to work with a model using `FastAPI`. It loads a model version that is currently in `Production` stage in the MLFlow model registry.     
+I am running all these microservices using `docker-compose`, so you can reproduce a fully functional service with only a few commands (see [Getting Started](#getting-started) section).    
+Take a look at the scheme that depicts how my `docker-compose` is organized:
+```mermaid
+flowchart TB
+  VDockerpostgres{{./Docker/postgres/}} x-. /var/lib/postgresql/data .-x postgres[(postgres)]
+  VDockerminio{{./Docker/minio/}} x-. /buckets .-x minio
+  VDockernginxconf{{./Docker/nginx.conf}} -. /etc/nginx/nginx.conf .-x nginx
+  minioclient[minio_client] --> minio
+  mlflowserver[mlflow_server] --> postgres
+  mlflowserver --> minioclient
+  mlflowserver --> nginx
+  modelapi[model_api] --> mlflowserver
+  modelapi --> nginx
+  nginx --> minio
+  P0((5432)) -.-> postgres
+  P1((9000)) -.-> nginx
+  P2((9001)) -.-> nginx
+  P3((5000)) -.-> mlflowserver
+  P4((8000)) -.-> modelapi
+
+  classDef volumes fill:#fdfae4,stroke:#867a22
+  class VDockerpostgres,VDockerminio,VDockernginxconf volumes
+  classDef ports fill:#f8f8f8,stroke:#ccc
+  class P0,P1,P2,P3,P4 ports
+```
+It may look kind of confusing, let me break it down for you. We go from top to bottom:   
+- You can see that `model_api` microservice is mapped to the port `8000` on host machine to port `8000` in container (`'8000:8000'`). This is a docker container with our FastAPI server code.
+- It depends on `mlflow_server` microservice, that runs on port `5000`. This is a docker container that runs MLFLow Tracking Server inside. You can find `Dockerfile` to build this image at `Docker/mlflow_server_image/Dockerfile`.
+- Then we see a dependency on `PostgreSQL` database. It uses volume, to save data even if container is stopped. Path inside a hexagon indicates a volume location on the host machine, and label matches location inside a container.
+- Next, `mlflow_server` also depends on `minio_client` microservice. This is a small container to automatically create user and S3-bucket when first launching a `docker-compose`.
+- Obviously, to create users and buckets, `minio_client` must depend on `minio` microservice, that gives us access to a Minio API on port `9000` and graphic UI on port `9001`. You can see another volume here.
+- Finally, you may have noticed that we have `nginx` microservice that actually exposes ports `9000` and `9001` to a host machine. In this setup, `nginx` works as a load balancer and proxifies all requests to Minio API and Minio UI.    
+Now you can deploy this `docker-compose` to some cloud and experiment with different models, while all the needed data will be tracked and store remotely. Or build some services using model API. You can change usernames, passwords, bucket names etc. defined in a `.env` file as you wish. 

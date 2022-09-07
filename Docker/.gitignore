@@ -6,3 +6,5 @@
 !Docker/
 !mlflow_image/
 !mlflow_image/*
+!model_api_image/
+!model_api_image/*

@@ -172,7 +172,7 @@ def get_confusion_matrix(
     figsize = kwargs.get('figsize')
     if figsize:
         cm.figure_.set_size_inches(figsize)
-
+    cm.figure_.tight_layout()
     cm.figure_.set_dpi(kwargs.get('dpi', 100))
     return cm
 
