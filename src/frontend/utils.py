@@ -41,7 +41,8 @@ def merge_bounding_boxes(
     rightmost_p = max(points, key=lambda p: (p.x, p.y))
     highest_p = min(points, key=lambda p: p.y)
     lowest_p = max(points, key=lambda p: p.y)
-    return Point(leftmost_p.x, highest_p.y), Point(rightmost_p.x, lowest_p.y)
+    p1 = Point(max(0, leftmost_p.x,), max(0, highest_p.y))
+    return p1, Point(rightmost_p.x, lowest_p.y)
 
 
 def encode_image(img):

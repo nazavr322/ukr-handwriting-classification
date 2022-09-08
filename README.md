@@ -17,8 +17,8 @@ All data versioning, managing and preprocessing is done using DVC. I performed h
 - [x] **Backend**
     - [x] Add hyperparameter logging and model tracking using MLFlow.
     - [x] Create Docker Compose with Minio S3 for artifact storage, PostgreSQL for model registry, MLFlow server and backend code with FastAPI
-- [ ] **Frontend**
-    - [ ] Create web interface with streamlit  
+- [x] **Frontend**
+    - [x] Create web interface with streamlit  
 - [ ] **Deploy**
     - [ ] Deploy Docker container to some cloud VM.
     
@@ -65,7 +65,9 @@ Below I will go over the various parts of the project, explaining some key point
 │   ├── features        <- Scripts to turn raw data into features for modeling.
 │   │   └── features.py         <- File with functions to generate new features.
 │   ├── frontend        <- All frontend related code.
-│   │   ├── Home.py             <- File with web-site main page.
+│   │   ├── pages       <- Folder with web-site additional pages.
+│   │   │   └── ❓ About.py     <- Filw with web-site about page.
+│   │   ├── 🏠 Home.py          <- File with web-site main page.
 │   │   └── utils.py            <- File with utility functions.
 │   └── models          <- Scripts to train and evaluate models.
 │       ├── functional.py       <- File with utility functions used in training and validation.
