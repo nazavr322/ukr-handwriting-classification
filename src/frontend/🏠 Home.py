@@ -41,7 +41,7 @@ st.markdown('Draw a letter or digit. Click ⤓. Repeat!')
 with st.sidebar:
     st.info(
         'Currently, there are no uppercase variants for the following letters: '
-        f"**{', '.join(c for c in ('ґ', 'и', 'м', *LABELS[29:]))}**  \n\n"
+        f"***{', '.join(c for c in ('ґ', 'и', 'м', *LABELS[29:]))}***  \n\n"
         'So, if you draw these letters in their uppercase variations, chances '
         "are that you won't receive expected results.  \n\n"
         "But you can still draw and upload them to the service! Since I'm "
@@ -87,6 +87,7 @@ cropped_img = canvas_img[p1.y : p2.y, p1.x : p2.x]
 padded_img = cv.copyMakeBorder(
     cropped_img, 20, 20, 20, 20, cv.BORDER_CONSTANT, value=[255, 255, 255]
 )
+
 encoded_img = encode_image(padded_img)
 file = {'img_file': ('test_img.png', encoded_img)}
 
@@ -94,9 +95,9 @@ with st.spinner('Processing your image...'):
     response = requests.post(API_ENDPOINT, files=file)
     label_logits, is_upp_logits = response.json().values()
     best, *top2 = np.argsort(-np.array(label_logits))[:3]
-    kind = 'a lowercase' if is_upp_logits <= 0.5 else 'an uppercase'
+    kind = 'a ***lowercase***' if is_upp_logits <= 0.5 else 'an ***uppercase***'
     prediction_msg = (
-        f'The model thinks that you drew {kind} {LABELS[best]}.'
-        f'  \nIt might also be: {" ".join(LABELS[i] for i in top2)}'
+        f'The model thinks that you drew {kind} ***{LABELS[best]}***.  \nIt might '
+        f'also be such symbols as: ***{" ".join(LABELS[i] for i in top2)}***'
     )
 st.info(prediction_msg, icon='🤖')
