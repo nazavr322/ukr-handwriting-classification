@@ -1,4 +1,0 @@
-[core]
-    remote = data_bucket
-['remote "data_bucket"']
-    url = s3://glyphs-classification-bucket
