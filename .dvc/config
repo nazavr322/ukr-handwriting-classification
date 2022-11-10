@@ -1,0 +1,4 @@
+[core]
+    remote = dvc_data
+['remote "dvc_data"']
+    url = s3://ukr-classification-dvc
