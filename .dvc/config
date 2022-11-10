@@ -1,4 +1,4 @@
 [core]
-    remote = data_bucket
-['remote "data_bucket"']
-    url = s3://glyphs-classification-bucket
+    remote = dvc_data
+['remote "dvc_data"']
+    url = s3://ukr-classification-dvc

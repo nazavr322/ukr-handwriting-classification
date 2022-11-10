@@ -39,19 +39,6 @@ stages:
     - path: data/processed/final.csv
       md5: 2f033bb1cbd0d700c71647d9c3586587
       size: 37007
-  train_test_split:
-    cmd: python src/data/split_train_test.py data/processed/final.csv
-    deps:
-    - path: data/processed/final.csv
-      md5: 2f033bb1cbd0d700c71647d9c3586587
-      size: 37007
-    outs:
-    - path: data/processed/test_data.csv
-      md5: 4a90611810519a1727d453b4c79cabf7
-      size: 7014
-    - path: data/processed/train_data.csv
-      md5: 2d4dccf04ccc0ddf586e38dbece3f7d6
-      size: 30030
   prepare_glyphs:
     cmd: python -m src.data.prepare_glyphs data/raw/glyphs.csv data/raw/glyphs/ data/interim/glyphs/
     deps:
@@ -83,6 +70,19 @@ stages:
       md5: bea02b3070925104f9257b6b242f9af4.dir
       size: 720456
       nfiles: 1581
+  train_test_split:
+    cmd: python src/data/split_train_test.py data/processed/final.csv
+    deps:
+    - path: data/processed/final.csv
+      md5: 2f033bb1cbd0d700c71647d9c3586587
+      size: 37007
+    outs:
+    - path: data/processed/test_data.csv
+      md5: 4a90611810519a1727d453b4c79cabf7
+      size: 7014
+    - path: data/processed/train_data.csv
+      md5: 2d4dccf04ccc0ddf586e38dbece3f7d6
+      size: 30030
   train_and_evaluate:
     cmd: python -m src.models.train_and_eval data/processed/train_data.csv data/processed/test_data.csv
       models/best_params.json --mnist_weights models/mnist_model.pt
@@ -103,30 +103,3 @@ stages:
     - path: models/mnist_model.pt
       md5: 888469a8360c8d350bfb7943db4f027d
       size: 3312672
-  train:
-    cmd: python -m src.models.train data/processed/train_data.csv models/mnist_model.pt
-      models/best_params.json models/test_run.pt
-    deps:
-    - path: data/processed/train_data.csv
-      md5: 000b7fd561981101b12365cb85c5f7ee
-      size: 30030
-    - path: models/best_params.json
-      md5: 46cd7d7adbeddc8cb8ab78a5c5836daa
-      size: 249
-    - path: models/mnist_model.pt
-      md5: 888469a8360c8d350bfb7943db4f027d
-      size: 3312672
-    outs:
-    - path: models/test_run.pt
-      md5: e34a10bef3043e0816e908b0351f1c29
-      size: 3348314
-  evaluate:
-    cmd: python -m src.models.evaluate data/processed/test_data.csv models/test_run.pt
-      reports/figures/
-    deps:
-    - path: data/processed/test_data.csv
-      md5: d298ed5f35958344cb2db903757fee52
-      size: 7014
-    - path: models/test_run.pt
-      md5: e34a10bef3043e0816e908b0351f1c29
-      size: 3348314

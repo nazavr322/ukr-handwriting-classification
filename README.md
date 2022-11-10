@@ -31,7 +31,7 @@ Below I will go over the various parts of the project, explaining some key point
 ├── data
 │   ├── interim         <- Intermediate data that has been transformed.
 │   ├── processed       <- The final, canonical data sets for modeling. 
-│   └── raw             <- The original, immutable data .
+│   └── raw             <- The original, immutable data.
 │
 ├── Docker              <- Folder to store docker volumes, Dockerfiles and files needed to build images.
 │   ├── mlflow_image
@@ -66,7 +66,7 @@ Below I will go over the various parts of the project, explaining some key point
 │   │   └── features.py         <- File with functions to generate new features.
 │   ├── frontend        <- All frontend related code.
 │   │   ├── pages       <- Folder with web-site additional pages.
-│   │   │   └── ❓ About.py     <- Filw with web-site about page.
+│   │   │   └── ❓ About.py     <- File with web-site about page.
 │   │   ├── 🏠 Home.py          <- File with web-site main page.
 │   │   └── utils.py            <- File with utility functions.
 │   └── models          <- Scripts to train and evaluate models.
