@@ -4,13 +4,12 @@ __pycache__/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# local mlflow runs
-mlruns/
-mlflow.db
-
 # PyCharm stuff
 .idea
 
 # Environment
 .env
 
+# Models
+models/
+!model/best_params.json

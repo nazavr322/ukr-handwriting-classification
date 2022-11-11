@@ -101,3 +101,11 @@ with st.spinner('Processing your image...'):
         f'also be such symbols as: ***{" ".join(LABELS[i] for i in top2)}***'
     )
 st.info(prediction_msg, icon='🤖')
+st.info(
+    (
+        'If you did not get the expected result, try drawing the same letter '
+        'or digit in another variation.\nCurrent dataset is very limited so '
+        'there simply might not be any samples in your style.'
+     ),
+    icon='ℹ️'
+)
