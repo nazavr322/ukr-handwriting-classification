@@ -5,11 +5,14 @@ import cv2 as cv
 import numpy as np
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
-from dotenv import load_dotenv
 
 from utils import create_bounding_boxes, merge_bounding_boxes, encode_image
 
-load_dotenv()  # load environmental variables
+
+def add_border(img: np.ndarray) -> np.ndarray:
+    return np.pad(img, ((1, 1), (1, 1), (0, 0)), constant_values=215)
+
+
 API_ENDPOINT = os.environ['API_ENDPOINT']
 HEIGHT = 170
 LABELS = '0123456789абвгґдеєжзиіїйклмнопрстуфхцчшщьюя'
@@ -20,13 +23,8 @@ ABOUT_STR = (
     '(https://github.com/nazavr322/ukr-handwriting-classification).'
 )
 
-
-def add_border(img: np.ndarray) -> np.ndarray:
-    return np.pad(img, ((1, 1), (1, 1), (0, 0)), constant_values=215)
-
-
 st.set_page_config(
-    page_title='Home ⏺  Ukrainian Handwriting Classification',
+    page_title='Home ●  Ukrainian Handwriting Classification',
     page_icon='📝',
     menu_items={
         'Get help': None,
@@ -104,7 +102,7 @@ st.info(prediction_msg, icon='🤖')
 st.info(
     (
         'If you did not get the expected result, try drawing the same letter '
-        'or digit in another variation.\nCurrent dataset is very limited so '
+        'or digit in another variation.  \nCurrent dataset is very limited so '
         'there simply might not be any samples in your style.'
      ),
     icon='ℹ️'
