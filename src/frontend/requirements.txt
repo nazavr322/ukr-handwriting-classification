@@ -1,0 +1,5 @@
+requests==2.28.1
+opencv-python==4.6.0.66
+numpy==1.23.4
+streamlit-drawable-canvas==0.9.2
+streamlit==1.12.0
