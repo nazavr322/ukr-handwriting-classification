@@ -34,7 +34,7 @@ st.set_page_config(
 )
 
 st.title('Classification of ukrainian handwriting 📝')
-st.markdown('Draw a letter or digit. Click ⤓. Repeat!')
+st.markdown('Draw a letter or digit. Click ⤓ to make prediction. Repeat!')
 
 with st.sidebar:
     st.info(
