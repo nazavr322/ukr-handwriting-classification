@@ -33,7 +33,7 @@ st.set_page_config(
     },
 )
 
-st.title('Classification of ukrainian handwriting 📝')
+st.title('Classification of Ukrainian handwriting 📝')
 st.markdown('Draw a letter or digit. Click ⤓ to make prediction. Repeat!')
 
 with st.sidebar:
