@@ -1,27 +1,42 @@
 # Project overview
-This is a simple pet-project to demonstrate some knowledge of Deep Learning and some MLOps practices and processes.   
-The final version will be a web-site where you will be able to draw a Ukrainian letter or digit and neural network will recognize it and determine whether it's lowercase or uppercase (last one is only for letters). All drawn samples will be automatically collected to improve model performance in a future.   
-All data versioning, managing and preprocessing is done using DVC. I performed hyperparameter optimization with Optuna and all the experiment tracking with MLFlow.  
-   
-**NOTE**: I will update this README as I make progress.
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ukrainian-handwriting-classification.streamlit.app/)  
+An end-to-end application for classifying Ukrainian handwriting that aims to demonstrate my knowledge of Deep Learning and MLOps tools and practices.  
+On the web page, which is made using [streamlit](https://github.com/streamlit), the user can draw a Ukrainian letter or digit, and the neural network will try to recognize it and estimate whether it is an uppercase or lowercase symbol. For this task, I trained a lightweight multi-output CNN.  
+Here are some of the tools that I've used during the development cycle: [DVC](https://github.com/iterative/dvc) to handle all the data versioning and preprocessing, [MLFlow](https://github.com/mlflow/mlflow) for experiment tracking and further model deployment, [Optuna](https://github.com/optuna/optuna) for hyperparameter optimization.  
+On the server side of the application, I created a model API using [FastAPI](https://github.com/tiangolo/fastapi), configured the MLFlow tracking server and model registry that are powered up by [PostgreSQL](https://www.postgresql.org/) and [Minio S3](https://github.com/minio/minio), which also serves as a storage for user input, for further re-training.  
+All of the above is wrapped up in reproducible [docker](https://github.com/docker) containers that are orchestrated using docker-compose and deployed to the Amazon EC2 instance.
 
-# Current progress
-- [x] **Data processing and DVC integration**
-    - [x] Rewrite plain functions as CLI-compatible scripts
-    - [x] Create remote S3 storage
-    - [x] Create data pre-processing pipeline
-    - [x] Add `train` and `evaluate` stages
-- [x] **Model training**
-    - [x] Create baseline model and pretrain it on MNIST.
-    - [x] Using transfer learning fine-tune pretrained model to recognize both digits and letters as well as uppercase/lowercase classification (Multi-Output CNN).
-- [x] **Backend**
-    - [x] Add hyperparameter logging and model tracking using MLFlow.
-    - [x] Create Docker Compose with Minio S3 for artifact storage, PostgreSQL for model registry, MLFlow server and backend code with FastAPI
-- [x] **Frontend**
-    - [x] Create web interface with streamlit  
-- [ ] **Deploy**
-    - [ ] Deploy Docker container to some cloud VM.
-    
+# Getting Started
+## Prerequisites
+To be able to work on this project, you need to have the following tools installed/configured on your machine: [`Poetry 1.2+`](https://python-poetry.org/), `Docker`, `AWS` credentials configured using [`AWS CLI`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+## Steps to reproduce
+- Clone the repository
+- To install all the dependencies execute: 
+	```shell
+	poetry install
+	```
+	If you don't need dev dependencies (things like `jupyter`, `matplotlib`, `blue auto-formatter`, etc.) execute:
+	```shell
+	poetry install --without dev
+	```
+- To get all the training data from dvc remote, execute:
+	```shell
+	poetry run dvc pull
+	```
+- To create .env file with predefined environmental variables, execute:
+	```shell
+	cat .env.example > .env
+	```
+- To start the microservices defined in docker compose (MLflow tracking server, model API, etc.) execute:
+	```shell
+	sudo docker-compose up -d --build
+	```
+	Now you can accesss MLFlow UI at http://localhost:5000 and Minio UI at http://localhost:9001 (use credentials specified in a `.env` file) 
+- To execute all the preprocessing steps and train a model run:
+	```shell
+	poetry run dvc repro
+	```
+
 # About
 Below I will go over the various parts of the project, explaining some key points.
 ## Project Structure
