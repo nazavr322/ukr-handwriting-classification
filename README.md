@@ -1,6 +1,6 @@
 # Project overview
 This is a simple pet-project to demonstrate some knowledge of Deep Learning and some MLOps practices and processes.   
-The final version will be a web-site where you will be able to draw a ukrainian letter or digit and neural network will recognize it and determine whether it's lowercase or uppercase (last one is only for letters). All drawn samples will be automatically collected to improve model performance in a future.   
+The final version will be a web-site where you will be able to draw a Ukrainian letter or digit and neural network will recognize it and determine whether it's lowercase or uppercase (last one is only for letters). All drawn samples will be automatically collected to improve model performance in a future.   
 All data versioning, managing and preprocessing is done using DVC. I performed hyperparameter optimization with Optuna and all the experiment tracking with MLFlow.  
    
 **NOTE**: I will update this README as I make progress.
@@ -114,8 +114,8 @@ flowchart TD
 	node11-->node10
 ```
 Let me break it down for you. As you can see first three steps are executed in parallel:
-1. **Clean data** - takes raw .csv file with ukrainian handwriting as an input and filters out all unnecessary information for our task.
-2. **Prepare glyphs** - takes folder containing raw images of ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).
+1. **Clean data** - takes raw .csv file with Ukrainian handwriting as an input and filters out all unnecessary information for our task.
+2. **Prepare glyphs** - takes folder containing raw images of Ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).
 3. **Prepare MNIST** - takes folder containing raw byte-encoded MNIST images and produces equal amount of .png images per class, as well as .csv file with metadata about these pictures (label, filename, etc.)
 4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.
 5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.
@@ -132,7 +132,7 @@ MNIST classification problem was solved long time ago, so I have nothing special
 ### Multi-output CNN
 Here, I slightly modified the architecture above. Let's see how it looks now:  
 ![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/complete_model_h.svg)
-As you can see, I've replaced one classification head with two FCN layers. First has 43 outputs (33 ukrainian letters and 10 digits) and the second one has only 1 output to predict whether sample is uppercase and lowercase.   
+As you can see, I've replaced one classification head with two FCN layers. First has 43 outputs (33 Ukrainian letters and 10 digits) and the second one has only 1 output to predict whether sample is uppercase and lowercase.   
 A few words about loss functions, after experimenting with different weighting strategies, to give more weight to a label classification task, I've discovered that one can achieve the most stable training process just summing up to loss functions. Thus, the final loss looked like this: $L = CE + BCE$.    
 All the hyperparameters where fine-tuned with [`optuna`](https://github.com/optuna/optuna) framework, you can check out this code at `notebooks/optuna.ipynb`.
 ## Final Evaluation Results
@@ -146,7 +146,7 @@ Also, I've prepared confusion matrices to visualize model predictions:
     
     
 I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metric values.
-We have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such ukrainian letters as, for example, `г` and `ґ`.
+We have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such Ukrainian letters as, for example, `г` and `ґ`.
 At the same time, we did pretty good on lowercase/uppercase classification too. On the corresponding confusion matrix you can see than we have only `2` false positives and `21` false negatives. And this is without knowing uppercase variants for 17 letters at all!    
    
 To sum up, this results look quite good, taking to account all constraints I have. Metrics values can be improvement in a future probably by adding more data.
