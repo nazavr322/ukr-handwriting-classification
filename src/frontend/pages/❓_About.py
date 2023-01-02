@@ -61,8 +61,8 @@ with tab1:
     )
     st.markdown(
         'Let me break it down for you. As you can see the first three steps are executed in parallel:  \n'
-        '1. **Clean data** - takes raw .csv file with ukrainian handwriting as an input and filters out all unnecessary information for our task.  \n'
-        '2. **Prepare glyphs** - takes folder containing raw images of ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).  \n'
+        '1. **Clean data** - takes raw .csv file with Ukrainian handwriting as an input and filters out all unnecessary information for our task.  \n'
+        '2. **Prepare glyphs** - takes folder containing raw images of Ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).  \n'
         '3. **Prepare MNIST** - takes folder containing raw byte-encoded MNIST images and produces equal amount of .png images per class, as well as .csv file with metadata about these pictures (label, filename, etc.)  \n'
         '4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.  \n'
         '5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.  \n'
@@ -102,7 +102,7 @@ with tab2:
         'Architecture of Multi-Output CNN. Made with Netron.',
     )
     st.markdown(
-        "As you can see, I've replaced one classification head with two FCN layers. First has 43 outputs (33 ukrainian letters and 10 digits) and the second one has only 1 output to predict whether sample is uppercase and lowercase."
+        "As you can see, I've replaced one classification head with two FCN layers. First has 43 outputs (33 Ukrainian letters and 10 digits) and the second one has only 1 output to predict whether sample is uppercase and lowercase."
     )
 
     st.subheader('Loss functions and hyperparameters')
@@ -133,7 +133,7 @@ with tab2:
 
     st.markdown(
         "I would not call the obtained results ideal, yes, there is room for improvement (that's why I'm collecting samples drawn by user actually), but still, I'm satisfied with the obtained metric values.  \n"
-        'I have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such ukrainian letters as, for example, `г` and `ґ`.  \n'
+        'I have a very lightweight model, trained for only 15 epochs. On my laptop GPU training lasts for a minute at its best. It generalizes pretty good on both tasks simultaneously. On the first confusion matrix you can see that model sometimes confuses such Ukrainian letters as, for example, `г` and `ґ`.  \n'
         'At the same time, we did pretty good on lowercase/uppercase classification too. On the corresponding confusion matrix you can see than we have only `2` false positives and `21` false negatives.'
     )
 with tab3:
