@@ -5,6 +5,8 @@ On the web page, which is made using [streamlit](https://github.com/streamlit), 
 Here are some of the tools that I've used during the development cycle: [DVC](https://github.com/iterative/dvc) to handle all the data versioning and preprocessing, [MLFlow](https://github.com/mlflow/mlflow) for experiment tracking and further model deployment, [Optuna](https://github.com/optuna/optuna) for hyperparameter optimization.  
 On the server side of the application, I created a model API using [FastAPI](https://github.com/tiangolo/fastapi), configured the MLFlow tracking server and model registry that are powered up by [PostgreSQL](https://www.postgresql.org/) and [Minio S3](https://github.com/minio/minio), which also serves as a storage for user input, for further re-training.  
 All of the above is wrapped up in reproducible [docker](https://github.com/docker) containers that are orchestrated using docker-compose and deployed to the Amazon EC2 instance.
+## Demonstration
+![](https://i.imgur.com/GovRbld.gif)
 
 # Getting Started
 ## Prerequisites
