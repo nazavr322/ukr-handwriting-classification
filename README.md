@@ -72,7 +72,7 @@ Below I will go over the various parts of the project, explaining some key point
 │   └── figures         <- Generated graphics and figures to be used in reporting.
 │
 ├── src                 <- Source code for use in this project.
-│   ├── backend         <- All backend related code..
+│   ├── backend         <- All backend related code.
 │   │   ├── main.py             <- Logic of a backend server.
 │   │   └── utils.py            <- File with utility functions.
 │   ├── data            <- Scripts related to data processing or generation.
@@ -139,9 +139,9 @@ Let me break it down for you. As you can see the first three steps are executed 
 2. **Prepare glyphs** - takes folder containing raw images of Ukrainian handwriting as an input and converts them to MNIST format (inverted 28x28 images).
 3. **Prepare MNIST** - takes folder containing raw byte-encoded MNIST images and produces equal amount of .png images per class, as well as .csv file with metadata about these pictures (label, filename, etc.)
 4. **Make dataset** - takes cleaned .csv file from stage(1) and .csv file with MNIST metadata from stage(3) and joins them resulting in a final dataset.
-5. **Merge pictures** - takes folder with processed images from stages(2) and (3) and merges them into one directory.
-6. **Train/test split** - splits .csv file from stage(4) into train and test subsets.
-7. **Train and evaluate** - fine-tunes model pre-trained on MNIST on a training data from stages (5) and (6) and evaluates its performance on test data also from stage(6).
+5. **Merge pictures** - takes folder with processed images from stages (2) and (3) and merges them into one directory.
+6. **Train/test split** - splits .csv file from stage (4) into train and test subsets.
+7. **Train and evaluate** - fine-tunes model pre-trained on MNIST on a training data from stages (5) and (6) and evaluates its performance on test data also from stage (6).
 
 That's it, even if it looks a little difficult, in fact, all the stages are quite simple. Take a look at how our final images look like after all the processing (without augmentations ofcourse):    
 ![](https://github.com/nazavr322/ukr-handwriting-classification/blob/main/reports/figures/10_proc_samples.png)   
