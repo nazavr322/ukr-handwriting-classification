@@ -2,8 +2,7 @@ import streamlit as st
 
 
 ABOUT_STR = (
-    'This is a simple pet-project to demonstrate some knowledge of Deep '
-    'Learning techniques alongside with MLOps tools and practices.  \n\n'
+    'An end-to-end application for classifying Ukrainian handwriting  \n\n'
     'You can find all the source code on my [github]'
     '(https://github.com/nazavr322/ukr-handwriting-classification).'
 )
